@@ -22,11 +22,23 @@ package coredump
 
 import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
+	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+func init() {
+	RegisterDefaults(builders.Scheme)
+	RegisterDefaults(builders.ParameterScheme)
+}
 
 // RegisterDefaults adds defaulters functions to the given scheme.
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	var SchemeGroupVersion = schema.GroupVersion{Group: "", Version: "coredump"}
+
+	scheme.AddKnownTypes(SchemeGroupVersion,
+		&CoredumpGetOptions{},
+	)
 	return nil
 }
