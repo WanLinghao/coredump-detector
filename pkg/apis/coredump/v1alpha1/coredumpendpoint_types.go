@@ -31,6 +31,7 @@ import (
 // CoredumpEndpoint
 // +k8s:openapi-gen=true
 // +resource:path=coredumpendpoints,strategy=CoredumpEndpointStrategy
+// +subresource:request=CoredumpEndpointDump,path=dump,kind=CoredumpEndpointDump
 type CoredumpEndpoint struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
