@@ -1,0 +1,7 @@
+note: CoredumpEndpoint Example
+sample: |
+  apiVersion: coredump.fujitsu.com/v1alpha1
+  kind: CoredumpEndpoint
+  metadata:
+    name: coredumpendpoint-example
+  spec:
