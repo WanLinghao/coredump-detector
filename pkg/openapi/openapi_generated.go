@@ -39,6 +39,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1.CoredumpEndpointSchemeFns": schema_pkg_apis_coredump_v1alpha1_CoredumpEndpointSchemeFns(ref),
 		"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1.CoredumpEndpointSpec":      schema_pkg_apis_coredump_v1alpha1_CoredumpEndpointSpec(ref),
 		"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1.CoredumpEndpointStatus":    schema_pkg_apis_coredump_v1alpha1_CoredumpEndpointStatus(ref),
+		"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1.CoredumpGetOptions":        schema_pkg_apis_coredump_v1alpha1_CoredumpGetOptions(ref),
 		"k8s.io/api/admissionregistration/v1alpha1.Initializer":                                       schema_k8sio_api_admissionregistration_v1alpha1_Initializer(ref),
 		"k8s.io/api/admissionregistration/v1alpha1.InitializerConfiguration":                          schema_k8sio_api_admissionregistration_v1alpha1_InitializerConfiguration(ref),
 		"k8s.io/api/admissionregistration/v1alpha1.InitializerConfigurationList":                      schema_k8sio_api_admissionregistration_v1alpha1_InitializerConfigurationList(ref),
@@ -846,6 +847,38 @@ func schema_pkg_apis_coredump_v1alpha1_CoredumpEndpointStatus(ref common.Referen
 			SchemaProps: spec.SchemaProps{
 				Description: "CoredumpEndpointStatus defines the observed state of CoredumpEndpoint",
 				Properties:  map[string]spec.Schema{},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_coredump_v1alpha1_CoredumpGetOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"container": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
 			},
 		},
 		Dependencies: []string{},
