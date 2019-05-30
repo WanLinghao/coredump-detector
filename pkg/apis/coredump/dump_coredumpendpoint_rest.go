@@ -23,40 +23,25 @@ import (
 	"context"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/rest"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var _ rest.CreaterUpdater = &CoredumpEndpointDumpREST{}
-var _ rest.Patcher = &CoredumpEndpointDumpREST{}
+var _ = rest.GetterWithOptions(&CoredumpEndpointDumpREST{})
 
 // +k8s:deepcopy-gen=false
 type CoredumpEndpointDumpREST struct {
 	Registry CoredumpEndpointRegistry
 }
 
-func (r *CoredumpEndpointDumpREST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
-	sub := obj.(*CoredumpEndpointDump)
-	rec, err := r.Registry.GetCoredumpEndpoint(ctx, sub.Name, &metav1.GetOptions{})
-	if err != nil {
-		return nil, err
-	}
-	// Modify rec in someway before writing it back to storage
-
-	r.Registry.UpdateCoredumpEndpoint(ctx, rec)
-	return rec, nil
-}
-
 // Get retrieves the object from the storage. It is required to support Patch.
-func (r *CoredumpEndpointDumpREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+func (r *CoredumpEndpointDumpREST) Get(ctx context.Context, name string, opts runtime.Object) (runtime.Object, error) {
 	return nil, nil
-}
-
-// Update alters the status subset of an object.
-func (r *CoredumpEndpointDumpREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
-	return nil, false, nil
 }
 
 func (r *CoredumpEndpointDumpREST) New() runtime.Object {
 	return &CoredumpEndpointDump{}
+}
+
+// NewGetOptions creates a new options object
+func (r *CoredumpEndpointDumpREST) NewGetOptions() (runtime.Object, bool, string) {
+	return &CoredumpGetOptions{}, false, ""
 }
