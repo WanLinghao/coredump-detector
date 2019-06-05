@@ -19,8 +19,10 @@ package stream
 import (
 	"context"
 	"io"
-	"bytes"
+	//"bytes"
 	"io/ioutil"
+	"os"
+	"bufio"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -44,7 +46,12 @@ func (obj *CoredumpStreamer) DeepCopyObject() runtime.Object {
 }
 
 func (s *CoredumpStreamer) InputStream(ctx context.Context, apiVersion, acceptHeader string) (stream io.ReadCloser, flush bool, contentType string, err error) {
-	stream = ioutil.NopCloser(bytes.NewReader([]byte(s.Body))) // r type is io.ReadCloser
+	f, err := os.Open(s.Body)
+	if err != nil {
+		return nil, true, "text/plain", err
+	}
+	stream = ioutil.NopCloser(bufio.NewReader(f)) // r type is io.ReadCloser
+	//stream = ioutil.NopCloser(bytes.NewReader([]byte(s.Body))) // r type is io.ReadCloser
 	flush = true
 	contentType = "text/plain"
 	err = nil

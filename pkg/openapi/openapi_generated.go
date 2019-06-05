@@ -834,7 +834,14 @@ func schema_pkg_apis_coredump_v1alpha1_CoredumpEndpointSpec(ref common.Reference
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "CoredumpEndpointSpec defines the desired state of CoredumpEndpoint",
-				Properties:  map[string]spec.Schema{},
+				Properties: map[string]spec.Schema{
+					"podUID": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
 			},
 		},
 		Dependencies: []string{},

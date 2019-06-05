@@ -23,6 +23,7 @@ import (
 	"log"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // +genclient
@@ -42,6 +43,7 @@ type CoredumpEndpoint struct {
 
 // CoredumpEndpointSpec defines the desired state of CoredumpEndpoint
 type CoredumpEndpointSpec struct {
+	PodUID types.UID  `json:"podUID,omitempty"`
 }
 
 // CoredumpEndpointStatus defines the observed state of CoredumpEndpoint
