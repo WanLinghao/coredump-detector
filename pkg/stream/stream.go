@@ -20,9 +20,9 @@ import (
 	"context"
 	"io"
 	//"bytes"
+	"bufio"
 	"io/ioutil"
 	"os"
-	"bufio"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"

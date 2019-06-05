@@ -1,4 +1,3 @@
-
 /*
 Copyright 2017 The Kubernetes Authors.
 
@@ -15,16 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
 package v1alpha1_test
 
 import (
 	"testing"
 
+	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/test"
 	"k8s.io/client-go/rest"
 
 	"github.com/WanLinghao/fujitsu-coredump/pkg/apis"

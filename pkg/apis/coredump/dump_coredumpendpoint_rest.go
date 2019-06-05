@@ -1,4 +1,3 @@
-
 /*
 Copyright 2017 The Kubernetes Authors.
 
@@ -15,16 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
 package coredump
 
 import (
-	"fmt"
 	"context"
+	"fmt"
+	"github.com/WanLinghao/fujitsu-coredump/pkg/stream"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/stream"
 )
 
 var _ = rest.GetterWithOptions(&CoredumpEndpointDumpREST{})
@@ -40,7 +37,7 @@ func (r *CoredumpEndpointDumpREST) Get(ctx context.Context, name string, opts ru
 	if !ok {
 		return nil, fmt.Errorf("invalid options object: %#v", opts)
 	}
-	return &stream.CoredumpStreamer{Body: coredumpOpts.Container,}, nil
+	return &stream.CoredumpStreamer{Body: coredumpOpts.Container}, nil
 }
 
 func (r *CoredumpEndpointDumpREST) New() runtime.Object {

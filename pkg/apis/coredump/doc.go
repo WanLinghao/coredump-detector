@@ -1,4 +1,3 @@
-
 /*
 Copyright 2017 The Kubernetes Authors.
 
@@ -15,12 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
-
 // +k8s:deepcopy-gen=package,register
 // +groupName=coredump.fujitsu.com
 
 // Package api is the internal version of the API.
 package coredump
-

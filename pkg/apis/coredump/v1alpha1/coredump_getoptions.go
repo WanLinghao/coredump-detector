@@ -1,4 +1,3 @@
-
 /*
 Copyright 2019 The Kubernetes Authors.
 
@@ -15,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
 package v1alpha1
 
 import (
@@ -28,5 +25,5 @@ import (
 
 type CoredumpGetOptions struct {
 	metav1.TypeMeta `json:",inline"`
-	Container string `json:"container,omitempty" protobuf:"bytes,1,opt,name=container"`
+	Container       string `json:"container,omitempty" protobuf:"bytes,1,opt,name=container"`
 }

@@ -21,8 +21,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 

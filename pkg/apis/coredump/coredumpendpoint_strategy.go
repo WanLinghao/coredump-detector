@@ -1,4 +1,3 @@
-
 /*
 Copyright 2017 The Kubernetes Authors.
 
@@ -15,18 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
 package coredump
 
 import (
 	"context"
-	"log"
 	"fmt"
+	"log"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Validate checks that an instance of CoredumpEndpoint is well formed
