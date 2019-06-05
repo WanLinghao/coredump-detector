@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump"
+	"github.com/WanLinghao/fujitsu-coredump/pkg/k8sclient"
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -34,7 +35,7 @@ var (
 		CoredumpEndpointSchemeFns{},
 		func() runtime.Object { return &CoredumpEndpoint{} },     // Register versioned resource
 		func() runtime.Object { return &CoredumpEndpointList{} }, // Register versioned resource list
-		&coredump.CoredumpEndpointStrategy{builders.StorageStrategySingleton},
+		&coredump.CoredumpEndpointStrategy{builders.StorageStrategySingleton, k8sclient.GetClient().CoreV1()},
 	)
 	ApiVersion = builders.NewApiVersion("coredump.fujitsu.com", "v1alpha1").WithResources(
 		coredumpCoredumpEndpointStorage,

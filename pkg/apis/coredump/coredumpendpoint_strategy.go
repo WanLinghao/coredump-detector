@@ -22,16 +22,38 @@ package coredump
 import (
 	"context"
 	"log"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Validate checks that an instance of CoredumpEndpoint is well formed
-func (CoredumpEndpointStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	o := obj.(*CoredumpEndpoint)
-	log.Printf("Validating fields for CoredumpEndpoint %s\n", o.Name)
+func (c *CoredumpEndpointStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
+	ce := obj.(*CoredumpEndpoint)
+	log.Printf("Validating fields for CoredumpEndpoint %s/%s\n", ce.Namespace, ce.Name)
 	errors := field.ErrorList{}
+
+	pod, err := c.PodClient.Pods(ce.Namespace).Get(ce.Name, metav1.GetOptions{})
+	if err != nil {
+		fieldError := field.InternalError(field.NewPath("spec").Child("podUID"), fmt.Errorf("get pod failed: %v", err))
+		errors = append(errors, fieldError)
+		return errors
+	}
+
+	if len(ce.Spec.PodUID) != 0 {
+		if pod.UID != ce.Spec.PodUID {
+			// the pod has been deleted
+			fieldError := field.InternalError(
+				field.NewPath("spec").Child("podUID"),
+				fmt.Errorf("the pod %s/%s has been delete", ce.Namespace, ce.Name))
+			errors = append(errors, fieldError)
+			return errors
+		}
+	} else {
+		ce.Spec.PodUID = pod.UID
+	}
 	// perform validation here and add to errors using field.Invalid
 	return errors
 }

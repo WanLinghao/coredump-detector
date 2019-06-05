@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apiserver/pkg/registry/rest"
+	coreclient "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 var (
@@ -105,6 +106,7 @@ type CoredumpEndpointSpec struct {
 // +k8s:deepcopy-gen=false
 type CoredumpEndpointStrategy struct {
 	builders.DefaultStorageStrategy
+	PodClient coreclient.PodsGetter
 }
 
 // +k8s:deepcopy-gen=false
