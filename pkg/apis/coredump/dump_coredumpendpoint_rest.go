@@ -19,7 +19,10 @@ package coredump
 import (
 	"context"
 	"fmt"
+	"path"
+
 	"github.com/WanLinghao/fujitsu-coredump/pkg/stream"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/rest"
 )
@@ -28,16 +31,30 @@ var _ = rest.GetterWithOptions(&CoredumpEndpointDumpREST{})
 
 // +k8s:deepcopy-gen=false
 type CoredumpEndpointDumpREST struct {
-	Registry CoredumpEndpointRegistry
+	RegistryPath string
+	Registry     CoredumpEndpointRegistry
 }
 
 // Get retrieves the object from the storage. It is required to support Patch.
 func (r *CoredumpEndpointDumpREST) Get(ctx context.Context, name string, opts runtime.Object) (runtime.Object, error) {
+	endpoint, err := r.Registry.GetCoredumpEndpoint(ctx, name, &metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	podUID := endpoint.Spec.PodUID
+	if podUID == "" {
+		return nil, fmt.Errorf("empty pod uid")
+	}
+
 	coredumpOpts, ok := opts.(*CoredumpGetOptions)
 	if !ok {
 		return nil, fmt.Errorf("invalid options object: %#v", opts)
 	}
-	return &stream.CoredumpStreamer{Body: coredumpOpts.Container}, nil
+
+	coreFilePath := path.Clean(r.RegistryPath + "/" + endpoint.Namespace + "/" + string(podUID) + "/" + coredumpOpts.Container)
+
+	return &stream.CoredumpStreamer{CoreFilePath: coreFilePath}, nil
 }
 
 func (r *CoredumpEndpointDumpREST) New() runtime.Object {

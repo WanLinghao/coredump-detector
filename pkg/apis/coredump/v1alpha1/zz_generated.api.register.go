@@ -51,7 +51,7 @@ var (
 			func() runtime.Object { return &CoredumpEndpointDump{} }, // Register versioned resource
 			nil,
 			func(generic.RESTOptionsGetter) rest.Storage {
-				return &coredump.CoredumpEndpointDumpREST{coredump.NewCoredumpEndpointRegistry(coredumpCoredumpEndpointStorage)}
+				return &coredump.CoredumpEndpointDumpREST{"/nfs", coredump.NewCoredumpEndpointRegistry(coredumpCoredumpEndpointStorage)}
 			},
 		),
 	)
