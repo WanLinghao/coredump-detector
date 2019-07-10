@@ -66,7 +66,8 @@ type PostStartHook struct {
 }
 
 // StartApiServer starts an apiserver hosting the provider apis and openapi definitions.
-func StartApiServer(etcdPath string, apis []*builders.APIGroupBuilder, openapidefs openapi.GetOpenAPIDefinitions, title, version string, tweakConfigFuncs ...func(apiServer *apiserver.Config) error) {
+func StartApiServer(etcdPath string, apis []*builders.APIGroupBuilder, openapidefs openapi.GetOpenAPIDefinitions, title, version string,
+	flagFunc func(*cobra.Command) error, tweakConfigFuncs ...func(apiServer *apiserver.Config) error) {
 	logs.InitLogs()
 	defer logs.FlushLogs()
 
@@ -75,7 +76,7 @@ func StartApiServer(etcdPath string, apis []*builders.APIGroupBuilder, openapide
 	signalCh := genericapiserver.SetupSignalHandler()
 	// To disable providers, manually specify the list provided by getKnownProviders()
 	cmd, _ := NewCommandStartServer(etcdPath, os.Stdout, os.Stderr, apis, signalCh, title, version, tweakConfigFuncs...)
-
+	flagFunc(cmd)
 	cmd.Flags().AddFlagSet(pflag.CommandLine)
 	if err := cmd.Execute(); err != nil {
 		panic(err)
