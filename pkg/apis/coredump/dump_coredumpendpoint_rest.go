@@ -19,7 +19,6 @@ package coredump
 import (
 	"context"
 	"fmt"
-	"path"
 
 	"github.com/WanLinghao/fujitsu-coredump/pkg/stream"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,7 +30,6 @@ var _ = rest.GetterWithOptions(&CoredumpEndpointDumpREST{})
 
 // +k8s:deepcopy-gen=false
 type CoredumpEndpointDumpREST struct {
-	RegistryPath string
 	Registry     CoredumpEndpointRegistry
 }
 
@@ -42,7 +40,7 @@ func (r *CoredumpEndpointDumpREST) Get(ctx context.Context, name string, opts ru
 		return nil, err
 	}
 
-	podUID := endpoint.Spec.PodUID
+	podUID := string(endpoint.Spec.PodUID)
 	if podUID == "" {
 		return nil, fmt.Errorf("empty pod uid")
 	}
@@ -52,9 +50,7 @@ func (r *CoredumpEndpointDumpREST) Get(ctx context.Context, name string, opts ru
 		return nil, fmt.Errorf("invalid options object: %#v", opts)
 	}
 
-	coreFilePath := path.Clean(r.RegistryPath + "/" + endpoint.Namespace + "/" + string(podUID) + "/" + coredumpOpts.Container)
-
-	return &stream.CoredumpStreamer{CoreFilePath: coreFilePath}, nil
+	return stream.NewCoredumpStreamer(endpoint.Namespace, podUID, coredumpOpts.Container)
 }
 
 func (r *CoredumpEndpointDumpREST) New() runtime.Object {

@@ -14,21 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package stream
+package backend
 
-import (
-	"github.com/spf13/cobra"
-)
-
-var (
-	BackendPath        string
-	BackendPathSetFunc func(*cobra.Command) error
-)
-
-func init() {
-	BackendPathSetFunc = func(cmd *cobra.Command) error {
-		flags := cmd.Flags()
-		flags.StringVar(&BackendPath, "backend-path", BackendPath, "the back end storage")
-		return nil
-	}
+type Storage interface {
+	GetCoreFiles(string, string, string) (string, error)
 }

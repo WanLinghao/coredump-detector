@@ -17,10 +17,9 @@ limitations under the License.
 package stream
 
 import (
-	"archive/tar"
 	"bufio"
-	"compress/gzip"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -28,12 +27,48 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/rest"
+
+	"github.com/WanLinghao/fujitsu-coredump/pkg/stream/backend"
 )
 
 // CoredumpStreamer is a resource that streams the contents of a particular
 // location URL.
 type CoredumpStreamer struct {
-	CoreFilePath string
+	Namespace     string
+	PodUID        string
+	ContainerName string
+
+	// storage handles core file download
+	storage backend.Storage
+}
+
+func NewCoredumpStreamer(ns, podUID, containerName string) (*CoredumpStreamer, error) {
+	var (
+		s   backend.Storage
+		err error
+	)
+
+	if streamOpts.BackendStorageKind == "local" {
+		s, err = backend.NewLocalStorage(streamOpts.LocalPath)
+		if err != nil {
+			return nil, err
+		}
+	} else if streamOpts.BackendStorageKind == "aws" {
+		s, err = backend.NewAwsStorage(streamOpts.AwsS3Host, streamOpts.AwsS3AccessKey,
+			streamOpts.AwsS3SecretKey, streamOpts.AwsS3Region, streamOpts.AwsS3Bucket, true)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf("unsupported backend storage:%s, only support 'aws' or 'local'", streamOpts.BackendStorageKind)
+	}
+
+	return &CoredumpStreamer{
+		Namespace:     ns,
+		PodUID:        podUID,
+		ContainerName: containerName,
+		storage:       s,
+	}, nil
 }
 
 // a CoredumpStreamer must implement a rest.ResourceStreamer
@@ -47,7 +82,7 @@ func (obj *CoredumpStreamer) DeepCopyObject() runtime.Object {
 }
 
 func (s *CoredumpStreamer) InputStream(ctx context.Context, apiVersion, acceptHeader string) (stream io.ReadCloser, flush bool, contentType string, err error) {
-	tarFilePath, err := makeTar(s.CoreFilePath, "/tmp")
+	tarFilePath, err := s.storage.GetCoreFiles(s.Namespace, s.PodUID, s.ContainerName)
 	if err != nil {
 		return nil, true, "text/plain", err
 	}
@@ -62,70 +97,4 @@ func (s *CoredumpStreamer) InputStream(ctx context.Context, apiVersion, acceptHe
 
 	err = nil
 	return
-}
-
-func makeTar(sourceDir, destBase string) (string, error) {
-	destFile, err := ioutil.TempFile(destBase, "coredump-*.tar.gz")
-	if err != nil {
-		return "", err
-	}
-	defer destFile.Close()
-
-	gw := gzip.NewWriter(destFile)
-	defer gw.Close()
-	tw := tar.NewWriter(gw)
-	defer tw.Close()
-
-	fd, err := os.Open(sourceDir)
-	if err != nil {
-		return "", err
-	}
-	defer fd.Close()
-
-	err = compress(fd, "", tw)
-	if err != nil {
-		return "", err
-	}
-
-	return destFile.Name(), nil
-}
-
-func compress(file *os.File, prefix string, tw *tar.Writer) error {
-	info, err := file.Stat()
-	if err != nil {
-		return err
-	}
-	if info.IsDir() {
-		prefix = prefix + "/" + info.Name()
-		fileInfos, err := file.Readdir(-1)
-		if err != nil {
-			return err
-		}
-		for _, fi := range fileInfos {
-			f, err := os.Open(file.Name() + "/" + fi.Name())
-			if err != nil {
-				return err
-			}
-			err = compress(f, prefix, tw)
-			if err != nil {
-				return err
-			}
-		}
-	} else {
-		header, err := tar.FileInfoHeader(info, "")
-		header.Name = prefix + "/" + header.Name
-		if err != nil {
-			return err
-		}
-		err = tw.WriteHeader(header)
-		if err != nil {
-			return err
-		}
-		_, err = io.Copy(tw, file)
-		file.Close()
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }

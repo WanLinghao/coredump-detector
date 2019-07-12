@@ -21,7 +21,6 @@ package v1alpha1
 import (
 	"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump"
 	"github.com/WanLinghao/fujitsu-coredump/pkg/k8sclient"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/stream"
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -52,7 +51,7 @@ var (
 			func() runtime.Object { return &CoredumpEndpointDump{} }, // Register versioned resource
 			nil,
 			func(generic.RESTOptionsGetter) rest.Storage {
-				return &coredump.CoredumpEndpointDumpREST{stream.BackendPath, coredump.NewCoredumpEndpointRegistry(coredumpCoredumpEndpointStorage)}
+				return &coredump.CoredumpEndpointDumpREST{coredump.NewCoredumpEndpointRegistry(coredumpCoredumpEndpointStorage)}
 			},
 		),
 	)
