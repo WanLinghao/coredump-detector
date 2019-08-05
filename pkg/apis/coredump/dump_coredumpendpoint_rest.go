@@ -30,7 +30,7 @@ var _ = rest.GetterWithOptions(&CoredumpEndpointDumpREST{})
 
 // +k8s:deepcopy-gen=false
 type CoredumpEndpointDumpREST struct {
-	Registry     CoredumpEndpointRegistry
+	Registry CoredumpEndpointRegistry
 }
 
 // Get retrieves the object from the storage. It is required to support Patch.

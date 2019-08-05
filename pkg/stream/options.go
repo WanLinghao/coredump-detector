@@ -18,23 +18,31 @@ package stream
 
 import (
 	"github.com/spf13/cobra"
+	"time"
 )
 
 type StreamOptions struct {
 	BackendStorageKind string
 
+	// Settings for aws storage
 	AwsS3Host      string
 	AwsS3AccessKey string
 	AwsS3SecretKey string
 	AwsS3Region    string
 	AwsS3Bucket    string
 
+	// Settings for local storage
 	LocalPath string
+
+	//
+	CoreFileSurvivalTime        time.Duration
+	CoreFileMaxSizePerContainer string
 }
 
 var (
-	streamOpts         *StreamOptions
-	BackendPathSetFunc func(*cobra.Command) error
+	streamOpts               *StreamOptions
+	BackendPathSetFunc       func(*cobra.Command) error
+	CoreFileSurvivalTimeFunc func(*cobra.Command) error
 )
 
 func init() {
@@ -53,6 +61,13 @@ func init() {
 		flags.StringVar(&streamOpts.AwsS3Region, "aws-region", "default", "aws region, only useable when backend-kind is 'aws'")
 
 		flags.StringVar(&streamOpts.AwsS3Bucket, "aws-bucket", streamOpts.AwsS3Bucket, "aws bucket name, only useable when backend-kind is 'aws'")
+		return nil
+	}
+
+	CoreFileSurvivalTimeFunc = func(cmd *cobra.Command) error {
+		flags := cmd.Flags()
+		flags.DurationVar(&streamOpts.CoreFileSurvivalTime, "core-file-survival-time", 24*time.Hour, "core file survival time before gc")
+		flags.StringVar(&streamOpts.CoreFileMaxSizePerContainer, "core-file-max-per-container", "1GB", "core file max size per container, must be integer, support 'KB', 'MB', 'GB'")
 		return nil
 	}
 }
