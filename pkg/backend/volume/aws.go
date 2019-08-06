@@ -14,17 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package backend
+package volume
 
 import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+
+	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
 )
 
 type awsStorage struct {
@@ -36,7 +39,7 @@ type awsStorage struct {
 	PathStyle bool
 }
 
-func NewAwsStorage(host, accessKey, secretKey, region, bucket string, pathStyle bool) (Storage, error) {
+func NewAwsStorage(host, accessKey, secretKey, region, bucket string, pathStyle bool) (types.Storage, error) {
 	return &awsStorage{
 		Host:      host,
 		AccessKey: accessKey,
@@ -53,6 +56,21 @@ func (a *awsStorage) GetCoreFiles(ns, podUID, container string) (string, error) 
 	dest := "/tmp/" + fileKey
 	err := a.download(fileKey, dest)
 	return dest, err
+}
+
+func (a *awsStorage) CleanNamespace(namespace string) error {
+	// TODO: implements clean logic
+	return nil
+}
+
+func (a *awsStorage) LogPodDeletion(namespace string, podUID string, deletionTimestamp time.Time) error {
+	// TODO: implements log pod deletion logic
+	return nil
+}
+
+func (a *awsStorage) GC() error {
+	// TODO: implements gc logic
+	return nil
 }
 
 // ----------------------------------------------------------

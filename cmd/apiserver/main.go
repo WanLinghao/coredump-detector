@@ -24,28 +24,29 @@ import (
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/cmd/server"
 	_ "k8s.io/client-go/plugin/pkg/client/auth" // Enable cloud provider auth
 
-	"github.com/spf13/cobra"
 	"github.com/WanLinghao/fujitsu-coredump/pkg/apis"
+	backend "github.com/WanLinghao/fujitsu-coredump/pkg/backend/options"
+	gc "github.com/WanLinghao/fujitsu-coredump/pkg/gc/options"
 	"github.com/WanLinghao/fujitsu-coredump/pkg/openapi"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/stream"
+	"github.com/spf13/cobra"
 )
 
 func main() {
 	version := "v0"
 
 	flagFuncs := []func(*cobra.Command) error{
-		stream.BackendPathSetFunc,
-		stream.CoreFileSurvivalTimeFunc,
+		backend.BackendPathSetFunc,
+		gc.GCSetFunc,
 	}
-	
-	opts := &server.StartOptions {
-		EtcdPath : "/registry/fujitsu.com",
-		Apis : apis.GetAllApiBuilders(),
-		Openapidefs : openapi.GetOpenAPIDefinitions,
-		Title : "Api",
-		Version: version,
-		
-		FlagConfigFuncs : flagFuncs,
+
+	opts := &server.StartOptions{
+		EtcdPath:    "/registry/fujitsu.com",
+		Apis:        apis.GetAllApiBuilders(),
+		Openapidefs: openapi.GetOpenAPIDefinitions,
+		Title:       "Api",
+		Version:     version,
+
+		FlagConfigFuncs: flagFuncs,
 	}
 	server.StartApiServerWithOptions(opts)
 	//server.StartApiServer("/registry/fujitsu.com", apis.GetAllApiBuilders(), openapi.GetOpenAPIDefinitions, "Api", version, )

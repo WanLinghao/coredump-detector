@@ -19,7 +19,7 @@ package stream
 import (
 	"bufio"
 	"context"
-	"fmt"
+	//"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -28,7 +28,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/rest"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/stream/backend"
+	"github.com/WanLinghao/fujitsu-coredump/pkg/backend"
+	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
 )
 
 // CoredumpStreamer is a resource that streams the contents of a particular
@@ -39,35 +40,35 @@ type CoredumpStreamer struct {
 	ContainerName string
 
 	// storage handles core file download
-	storage backend.Storage
+	storage types.Storage
 }
 
 func NewCoredumpStreamer(ns, podUID, containerName string) (*CoredumpStreamer, error) {
-	var (
-		s   backend.Storage
-		err error
-	)
+	// var (
+	// 	s   types.Storage
+	// 	err error
+	// )
 
-	if streamOpts.BackendStorageKind == "local" {
-		s, err = backend.NewLocalStorage(streamOpts.LocalPath)
-		if err != nil {
-			return nil, err
-		}
-	} else if streamOpts.BackendStorageKind == "aws" {
-		s, err = backend.NewAwsStorage(streamOpts.AwsS3Host, streamOpts.AwsS3AccessKey,
-			streamOpts.AwsS3SecretKey, streamOpts.AwsS3Region, streamOpts.AwsS3Bucket, true)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, fmt.Errorf("unsupported backend storage:%s, only support 'aws' or 'local'", streamOpts.BackendStorageKind)
-	}
+	// if streamOpts.BackendStorageKind == "local" {
+	// 	s, err = backend.NewLocalStorage(streamOpts.LocalPath)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// } else if streamOpts.BackendStorageKind == "aws" {
+	// 	s, err = backend.NewAwsStorage(streamOpts.AwsS3Host, streamOpts.AwsS3AccessKey,
+	// 		streamOpts.AwsS3SecretKey, streamOpts.AwsS3Region, streamOpts.AwsS3Bucket, true)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// } else {
+	// 	return nil, fmt.Errorf("unsupported backend storage:%s, only support 'aws' or 'local'", streamOpts.BackendStorageKind)
+	// }
 
 	return &CoredumpStreamer{
 		Namespace:     ns,
 		PodUID:        podUID,
 		ContainerName: containerName,
-		storage:       s,
+		storage:       backend.GetBackendStorage(),
 	}, nil
 }
 
