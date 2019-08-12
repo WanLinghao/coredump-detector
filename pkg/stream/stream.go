@@ -44,26 +44,6 @@ type CoredumpStreamer struct {
 }
 
 func NewCoredumpStreamer(ns, podUID, containerName string) (*CoredumpStreamer, error) {
-	// var (
-	// 	s   types.Storage
-	// 	err error
-	// )
-
-	// if streamOpts.BackendStorageKind == "local" {
-	// 	s, err = backend.NewLocalStorage(streamOpts.LocalPath)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// } else if streamOpts.BackendStorageKind == "aws" {
-	// 	s, err = backend.NewAwsStorage(streamOpts.AwsS3Host, streamOpts.AwsS3AccessKey,
-	// 		streamOpts.AwsS3SecretKey, streamOpts.AwsS3Region, streamOpts.AwsS3Bucket, true)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// } else {
-	// 	return nil, fmt.Errorf("unsupported backend storage:%s, only support 'aws' or 'local'", streamOpts.BackendStorageKind)
-	// }
-
 	return &CoredumpStreamer{
 		Namespace:     ns,
 		PodUID:        podUID,

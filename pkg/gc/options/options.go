@@ -33,6 +33,7 @@ var (
 )
 
 func init() {
+	GCOpts = &GCOptions{}
 	GCSetFunc = func(cmd *cobra.Command) error {
 		flags := cmd.Flags()
 		flags.DurationVar(&GCOpts.GCPeriod, "gc-period", 1*time.Minute, "gc period")

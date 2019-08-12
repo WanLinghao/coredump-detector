@@ -19,14 +19,8 @@ package gcworker
 import (
 	"time"
 
-	//	"github.com/WanLinghao/fujitsu-coredump/pkg/k8sclient"
-	//	clientset "k8s.io/client-go/kubernetes"
-	//	"k8s.io/client-go/util/workqueue"
 	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
 	"k8s.io/klog"
-	//	"k8s.io/apimachinery/pkg/util/wait"
-	//	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	//	kubeinformers "k8s.io/client-go/informers"
 )
 
 // This gc worker do gc periodically, it mainly invokes the GC() function in backendStorage
@@ -44,6 +38,9 @@ func NewPeriodGC(period time.Duration, backendStorage types.Storage) *periodGC {
 }
 
 func (pgc *periodGC) Run(stopCh <-chan struct{}) {
+	klog.Infof("Starting core dump file period cleaner")
+	defer klog.Infof("Shutting down core dump file period cleaner")
+
 	tick := time.NewTicker(pgc.period)
 	for {
 		select {

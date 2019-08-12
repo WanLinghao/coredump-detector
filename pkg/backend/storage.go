@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"sync"
 
-
 	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/options"
 	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
 	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/volume"
@@ -34,8 +33,8 @@ func GetBackendStorage() types.Storage {
 	defer mu.Unlock()
 	var err error
 
-	if backendStorage == nil  {
-		// initialize backend storage 
+	if backendStorage == nil {
+		// initialize backend storage
 		if options.BackendOpts.BackendStorageKind == "local" {
 			backendStorage, err = volume.NewLocalStorage(options.BackendOpts.LocalPath)
 			if err != nil {

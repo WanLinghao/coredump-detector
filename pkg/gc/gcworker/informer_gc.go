@@ -21,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	//	"github.com/WanLinghao/fujitsu-coredump/pkg/k8sclient"
 	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
 	"k8s.io/api/core/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -31,7 +30,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
-	//"k8s.io/kubernetes/pkg/util/metrics"
 )
 
 // This gc worker follows the logic:
@@ -40,16 +38,17 @@ import (
 // 3. Other gc worker like period_gc worker would clean those deleted pods core files after a while
 
 type InformerGC struct {
-	//kubeClient clientset.Interface
-	workers        int
-	backendStorage types.Storage
-	queue          workqueue.RateLimitingInterface
-	gcThreshold    time.Duration
+	workers             int
+	backendStorage      types.Storage
+	queue               workqueue.RateLimitingInterface
+	gcThreshold         time.Duration
+	kubeInformerFactory kubeinformers.SharedInformerFactory
+	podListerSynced     cache.InformerSynced
+	nsListerSynced      cache.InformerSynced
 }
 
 func NewInformerGC(kubeClient clientset.Interface, backendStorage types.Storage, gt time.Duration) (*InformerGC, error) {
 	ig := &InformerGC{
-		//kubeClient : kubeClient,
 		workers:        5,
 		backendStorage: backendStorage,
 		queue:          workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "core_file_cleaner"),
@@ -59,18 +58,17 @@ func NewInformerGC(kubeClient clientset.Interface, backendStorage types.Storage,
 
 	nsInformer := kubeInformerFactory.Core().V1().Namespaces()
 	podInformer := kubeInformerFactory.Core().V1().Pods()
-	// if kubeClient.CoreV1().RESTClient().GetRateLimiter() != nil {
-	// 	if err := metrics.RegisterMetricAndTrackRateLimiterUsage("core_file_cleaner", kubeClient.CoreV1().RESTClient().GetRateLimiter()); err != nil {
-	// 		return nil, err
-	// 	}
-	// }
+
+	ig.podListerSynced = podInformer.Informer().HasSynced
+	ig.nsListerSynced = nsInformer.Informer().HasSynced
+
 	nsInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		DeleteFunc: ig.namespaceDeleted,
 	})
 	podInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		DeleteFunc: ig.podDeleted,
 	})
-
+	ig.kubeInformerFactory = kubeInformerFactory
 	return ig, nil
 }
 
@@ -78,12 +76,14 @@ func (ig *InformerGC) Run(stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
 	defer ig.queue.ShutDown()
 
-	klog.Infof("Starting core dump file cleaner")
-	defer klog.Infof("Shutting down core dump file cleaner")
+	klog.Infof("Starting core dump file inform cleaner")
+	defer klog.Infof("Shutting down core dump inform cleaner")
 
-	// if !controller.WaitForCacheSync("core dump file cleaner", stopCh, c.cmListerSynced) {
-	// 	return
-	// }
+	if !WaitForCacheSync("core dump file cleaner", stopCh, ig.podListerSynced, ig.nsListerSynced) {
+		return
+	}
+
+	ig.kubeInformerFactory.Start(stopCh)
 
 	for i := 0; i < ig.workers; i++ {
 		go wait.Until(ig.runWorker, time.Second, stopCh)
@@ -117,7 +117,7 @@ func (ig *InformerGC) processNextWorkItem() bool {
 func (ig *InformerGC) syncHandler(key string) error {
 	currentTime := time.Now()
 	defer func() {
-		klog.V(4).Infof("Finished syncing for key %s (%v)", key, time.Since(currentTime))
+		klog.Infof("Finished syncing for key %s (%v)", key, time.Since(currentTime))
 	}()
 
 	ns, podUID, err := ig.splitKey(key)
@@ -151,11 +151,11 @@ func (ig *InformerGC) podDeleted(obj interface{}) {
 		// double check
 		return
 	}
-	ig.queue.Add(ig.generateKey(pod.Namespace, pod.Name))
+	ig.queue.Add(ig.generateKey(pod.Namespace, string(pod.UID)))
 }
 
-func (ig *InformerGC) generateKey(ns, pod string) string {
-	return ns + "/" + pod
+func (ig *InformerGC) generateKey(ns, podUID string) string {
+	return ns + "/" + podUID
 }
 
 func (ig *InformerGC) splitKey(key string) (string, string, error) {
@@ -164,4 +164,17 @@ func (ig *InformerGC) splitKey(key string) (string, string, error) {
 		return "", "", fmt.Errorf("unexpected key:%s", fileds)
 	}
 	return fileds[0], fileds[1], nil
+}
+
+// This function was copied from package k8s.io/kubernetes/pkg/controller
+func WaitForCacheSync(controllerName string, stopCh <-chan struct{}, cacheSyncs ...cache.InformerSynced) bool {
+	klog.Infof("Waiting for caches to sync for %s controller", controllerName)
+
+	if !cache.WaitForCacheSync(stopCh, cacheSyncs...) {
+		utilruntime.HandleError(fmt.Errorf("unable to sync caches for %s controller", controllerName))
+		return false
+	}
+
+	klog.Infof("Caches are synced for %s controller", controllerName)
+	return true
 }
