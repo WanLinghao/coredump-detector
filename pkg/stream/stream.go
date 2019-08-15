@@ -64,6 +64,9 @@ func (obj *CoredumpStreamer) DeepCopyObject() runtime.Object {
 
 func (s *CoredumpStreamer) InputStream(ctx context.Context, apiVersion, acceptHeader string) (stream io.ReadCloser, flush bool, contentType string, err error) {
 	tarFilePath, err := s.storage.GetCoreFiles(s.Namespace, s.PodUID, s.ContainerName)
+	if os.IsNotExist(err) {
+		return nil, true, "text/plain", fmt.Errorf("container %s in pod %s/%s has no core dump files stored", s.ContainerName, s.Namespace, s.PodUID)
+	}
 	if err != nil {
 		return nil, true, "text/plain", err
 	}
