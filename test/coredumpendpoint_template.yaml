@@ -1,0 +1,6 @@
+apiVersion: coredump.fujitsu.com/v1alpha1
+kind: CoredumpEndpoint
+metadata:
+  namespace: __NAMESPACE__
+  name: __NAME__
+spec:

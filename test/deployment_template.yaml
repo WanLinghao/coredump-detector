@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: __DEPLOYMENT_NAME__
+  namespace: __NAMESPACE__
+spec:
+  selector:
+    matchLabels:
+      name: crash
+  replicas: __PODS_NUM__
+  template:
+    metadata:
+      labels:
+        name: crash
+    spec:
+      containers: 
+      - name: __CONTAINER_NAME_1__
+        image: __CRASH_TRIGGER_CONTAINER__
+        command: [ "/bin/ash" ]
+        args: [ "run.sh", "__PERIOD_1__" ]
+      - name: __CONTAINER_NAME_2__
+        image: __CRASH_TRIGGER_CONTAINER__
+        command: [ "/bin/ash" ]
+        args: [ "run.sh", "__PERIOD_2__" ]

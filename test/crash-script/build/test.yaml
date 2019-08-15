@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: robot
+  labels:
+    env: test
+spec:
+  containers:
+  - name: alpine
+    image: wlhtorresowen/fujitsu-coredump-integration-testing:v0.1
+    command: [ "/bin/ash" ]
+    args: [ "run.sh", "10" ]
