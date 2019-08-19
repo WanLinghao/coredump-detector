@@ -19,7 +19,7 @@ limitations under the License.
 package clientset
 
 import (
-	coredumpv1alpha1 "github.com/wanlinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset/typed/coredump/v1alpha1"
+	coredumpv1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset/typed/coredump/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"

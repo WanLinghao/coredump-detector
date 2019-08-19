@@ -19,7 +19,7 @@ limitations under the License.
 package fake
 
 import (
-	coredumpv1alpha1 "github.com/wanlinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1"
+	coredumpv1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

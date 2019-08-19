@@ -37,10 +37,6 @@ type BackendOptions struct {
 type Storage interface {
 	GetCoreFiles(namespace string, pod string, container string) (string, error)
 	CleanCoreFiles(namespace string, pod string, container string) error
-	CleanNamespace(namespace string) error
-	LogPodDeletion(namespace string, podUID string, deletionTimestamp time.Time) error
-	GC() error
-	//ListNamespacesPods() map[string][]string
 }
 
 type Metadata struct {

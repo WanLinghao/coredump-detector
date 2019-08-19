@@ -42,7 +42,7 @@ func NewBackendGC() (*BackendGC, error) {
 	}
 
 	workers["informer_gc_worker"] = informer
-	workers["period_gc_worker"] = gcworker.NewPeriodGC(options.GCOpts.GCPeriod, bs)
+	//	workers["period_gc_worker"] = gcworker.NewPeriodGC(options.GCOpts.GCPeriod, bs)
 
 	return &BackendGC{workers}, nil
 }

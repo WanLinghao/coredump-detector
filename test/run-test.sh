@@ -114,7 +114,6 @@ test_download_core_files(){
 
     
     raw_link=$(echo "/apis/coredump.fujitsu.com/v1alpha1/namespaces/${namespace}/coredumpendpoints/${pod}/dump?${container}")
-    #kubectl get --raw=/apis/coredump.fujitsu.com/v1alpha1/namespaces/default/coredumpendpoints/etcd-0/dump
     kubectl get --raw=$raw_link > /dev/null 2>&1
 }
 
@@ -147,16 +146,11 @@ clean_namespace(){
     kubectl delete ns -l $LABEL
 }
 
-if [ $# -gt 0 ];then
-echo "Use $1 as kube config file to access k8s cluster"
-export KUBECONFIG=$1
-else
 echo "Use default settings as kube config file to access k8s cluster"
-fi
 test_connect
 test_authority_all
 
-if [ $# -gt 1 ];then
+if [ $# -gt 0 ];then
 echo "Set test pod sum to $2"
 pod_max=$2
 else
@@ -171,7 +165,9 @@ read answer
 if [ $answer == "y" ];then
     echo "*****************BASIC TEST BEGIN************"
     test_basic
+    echo "*****************BASIC TEST DONE, NOW CLEAN************"
+    clean_namespace
 else
-    echo "*****************ww************"
+    echo "*****************SKIP TEST AND DO CLEAN JOBS************"
     clean_namespace
 fi
