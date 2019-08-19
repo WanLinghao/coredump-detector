@@ -58,6 +58,11 @@ func (a *awsStorage) GetCoreFiles(ns, podUID, container string) (string, error) 
 	return dest, err
 }
 
+func (a *awsStorage) CleanCoreFiles(ns, podUID, container string) error {
+	// TODO: implements clean logic
+	return nil
+}
+
 func (a *awsStorage) CleanNamespace(namespace string) error {
 	// TODO: implements clean logic
 	return nil

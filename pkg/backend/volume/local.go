@@ -83,6 +83,23 @@ func (l *localStorage) CleanNamespace(namespace string) error {
 	return nil
 }
 
+func (l *localStorage) CleanCoreFiles(namespace string, podUID string, container string) error {
+	path, err := l.getPath(namespace, podUID, container)
+	if os.IsNotExist(err) {
+		// Indicates no core files generated in that namespace
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("clean namespace %s failed: %v", err)
+	}
+
+	err = os.RemoveAll(path)
+	if err != nil {
+		return fmt.Errorf("clean namespace %s failed: %v", err)
+	}
+	return nil
+}
+
 func (l *localStorage) LogPodDeletion(namespace string, podUID string, gcTimeStamp time.Time) error {
 	path, err := l.getPath(namespace, podUID, "")
 	if os.IsNotExist(err) {

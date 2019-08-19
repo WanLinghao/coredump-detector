@@ -23,13 +23,18 @@ import (
 
 	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
 	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	kubeinformers "k8s.io/client-go/informers"
+	coredumpclientset "github.com/wanlinghao/fujitsu-coredump/pkg/client/clientset_generated"
+	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
+	utilerrors "k8s.io/apimachinery/pkg/util/errors"
+	"k8s.io/apimachinery/pkg/api/errors"
 )
 
 // This gc worker follows the logic:
@@ -40,8 +45,11 @@ import (
 type InformerGC struct {
 	workers             int
 	backendStorage      types.Storage
-	queue               workqueue.RateLimitingInterface
+	backendCleanQueue               workqueue.RateLimitingInterface
+	coredumpEndpointCleanQueue      workqueue.RateLimitingInterface
 	gcThreshold         time.Duration
+	kubeClient clientset.Interface
+	coredumpEndpointClient coredumpclientset.Interface
 	kubeInformerFactory kubeinformers.SharedInformerFactory
 	podListerSynced     cache.InformerSynced
 	nsListerSynced      cache.InformerSynced
@@ -51,10 +59,21 @@ func NewInformerGC(kubeClient clientset.Interface, backendStorage types.Storage,
 	ig := &InformerGC{
 		workers:        5,
 		backendStorage: backendStorage,
-		queue:          workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "core_file_cleaner"),
+		backendCleanQueue:          workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "backend_cleaner"),
+		coredumpEndpointCleanQueue:          workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "coredumpendpoint_cleaner"),
+
 		gcThreshold:    gt,
+		kubeClient:     kubeClient,
 	}
 	kubeInformerFactory := kubeinformers.NewSharedInformerFactory(kubeClient, time.Second*30)
+
+	cfg := config.GetConfigOrDie()
+	cdeClient, err := coredumpclientset.NewForConfig(cfg)
+	if err != nil {
+		clientLog.Error(err, "unable to set up client config")
+		os.Exit(1)
+	}
+	ig.coredumpEndpointClient = cdeClient
 
 	nsInformer := kubeInformerFactory.Core().V1().Namespaces()
 	podInformer := kubeInformerFactory.Core().V1().Pods()
@@ -74,7 +93,8 @@ func NewInformerGC(kubeClient clientset.Interface, backendStorage types.Storage,
 
 func (ig *InformerGC) Run(stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
-	defer ig.queue.ShutDown()
+	defer ig.backendCleanQueue.ShutDown()
+	defer ig.coredumpEndpointCleanQueue.ShutDown()
 
 	klog.Infof("Starting core dump file inform cleaner")
 	defer klog.Infof("Shutting down core dump inform cleaner")
@@ -92,48 +112,112 @@ func (ig *InformerGC) Run(stopCh <-chan struct{}) {
 	<-stopCh
 }
 
-func (ig *InformerGC) runWorker() {
-	for ig.processNextWorkItem() {
+func (ig *InformerGC) runBackendWorker() {
+	for ig.processBackendItem() {
 	}
 }
 
-func (ig *InformerGC) processNextWorkItem() bool {
-	key, quit := ig.queue.Get()
+func (ig *InformerGC) runCoredumpEndpointWorker() {
+	for ig.processCoredumpEndpointItem() {
+	}
+}
+
+func (ig *InformerGC) processBackendItem() bool {
+	key, quit := ig.backendCleanQueue.Get()
 	if quit {
 		return false
 	}
-	defer ig.queue.Done(key)
+	defer ig.backendCleanQueue.Done(key)
 
-	if err := ig.syncHandler(key.(string)); err != nil {
+	if err := ig.syncBackend(key.(string)); err != nil {
 		utilruntime.HandleError(fmt.Errorf("syncing %q failed: %v", key, err))
-		ig.queue.AddRateLimited(key)
+		ig.backendCleanQueue.AddRateLimited(key)
 		return true
 	}
 
-	ig.queue.Forget(key)
+	ig.backendCleanQueue.Forget(key)
 	return true
 }
 
-func (ig *InformerGC) syncHandler(key string) error {
+func (ig *InformerGC) processCoredumpEndpointItem() {
+	key, quit := ig.coredumpEndpointCleanQueue.Get()
+	if quit {
+		return false
+	}
+	defer ig.coredumpEndpointCleanQueue.Done(key)
+
+	if err := ig.syncCoredumpEndpoint(key.(string)); err != nil {
+		utilruntime.HandleError(fmt.Errorf("syncing %q failed: %v", key, err))
+		ig.coredumpEndpointCleanQueue.AddRateLimited(key)
+		return true
+	}
+
+	ig.coredumpEndpointCleanQueue.Forget(key)
+	return true
+}
+
+func (ig *InformerGC) syncBackend(key string) error {
 	currentTime := time.Now()
 	defer func() {
 		klog.Infof("Finished syncing for key %s (%v)", key, time.Since(currentTime))
 	}()
 
-	ns, podUID, err := ig.splitKey(key)
+	ns, _, podUID := ig.splitKey(key)
 	if err != nil {
 		return err
 	}
 
 	if ns == "" {
 		return fmt.Errorf("unexpected empty namespace")
-	} else if podUID == "" {
-		// indicates a namespace was deleted, and we should clean related core files
-		return ig.backendStorage.CleanNamespace(ns)
-	} else {
-		// indicates a pod was deleted, and we should log its deletion time and clean its core files after a while
-		return ig.backendStorage.LogPodDeletion(ns, podUID, currentTime.Add(ig.gcThreshold))
 	}
+
+	// Backend would handle podUID:
+	// 1. podUID is empty, it means delete all the core files of this namespace
+	// 2. podUID is NOT empty, it means delete the core files generated by this one specific pod
+	return ig.backendStorage.CleanCoreFiles(ns, podUID, "")
+}
+
+func (ig *InformerGC) syncCoredumpEndpoint(key string) error {
+	currentTime := time.Now()
+	defer func() {
+		klog.Infof("Finished syncing for key %s (%v)", key, time.Since(currentTime))
+	}()
+
+	ns, cdeName, podUID, err := ig.splitKey(key)
+	if err != nil {
+		return err
+	}
+	if ns == "" {
+		return fmt.Errorf("unexpected empty namespace")
+	}
+
+	allErrors := []error{}
+	if cdeName != "" {
+		// Clean one coredumpendpoint
+		currentCde, err := ig.coredumpEndpointClient.CoredumpV1alpha1().CoredumpEndpoints(ns).Get(cdeName)
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				allErrors = append(allErrors, err)
+			}
+		}
+
+		if string(currentCde.Spec.PodUID) == podUID {
+			// check the coredumpendpoint we are handling refers the same pod to the exist one in cluster
+			klog.Infof("Clean useless coredumpendpoint object %s/%s refering pod uid %s", ns, cdeName, podUID)
+			err = ig.coredumpEndpointClient.CoredumpV1alpha1().CoredumpEndpoints(ns).Delete(cdeName, &metav1.DeleteOptions{})
+			if err != nil {
+				allErrors = append(allErrors, err)
+			}
+		}
+	} else {
+		// Clean whole namespace
+		// TODO: this should be done automatically by apiserver
+		err = ig.coredumpEndpointClient.CoredumpV1alpha1().CoredumpEndpoints(ns).Delete(nil, metav1.DeleteOptions{})
+		if err != nil {
+			allErrors = append(allErrors, err)
+		}
+	}
+	return utilerrors.NewAggregate(allErrors)
 }
 
 func (ig *InformerGC) namespaceDeleted(obj interface{}) {
@@ -142,7 +226,8 @@ func (ig *InformerGC) namespaceDeleted(obj interface{}) {
 		// double check
 		return
 	}
-	ig.queue.Add(ig.generateKey(ns.Name, ""))
+	ig.backendCleanQueue.Add(ig.generateKey(ns.Name, "", ""))
+	ig.coredumpEndpointCleanQueue.Add(ig.generateKey(ns.Name, "", ""))
 }
 
 func (ig *InformerGC) podDeleted(obj interface{}) {
@@ -151,19 +236,20 @@ func (ig *InformerGC) podDeleted(obj interface{}) {
 		// double check
 		return
 	}
-	ig.queue.Add(ig.generateKey(pod.Namespace, string(pod.UID)))
+	ig.backendCleanQueue.AddAfter(ig.generateKey(pod.Namespace, pod.Name, string(pod.UID)), ig.gcThreshold)
+	ig.coredumpEndpointCleanQueue.AddAfter(ig.generateKey(pod.Namespace, pod.Name, string(pod.UID)), ig.gcThreshold)
 }
 
-func (ig *InformerGC) generateKey(ns, podUID string) string {
+func (ig *InformerGC) generateKey(ns, name, podUID string) string {
 	return ns + "/" + podUID
 }
 
-func (ig *InformerGC) splitKey(key string) (string, string, error) {
+func (ig *InformerGC) splitKey(key string) (ns, name, podUID string, error) {
 	fileds := strings.Split(key, "/")
-	if len(fileds) != 2 {
+	if len(fileds) != 3 {
 		return "", "", fmt.Errorf("unexpected key:%s", fileds)
 	}
-	return fileds[0], fileds[1], nil
+	return fileds[0], fileds[1], fileds[1], nil
 }
 
 // This function was copied from package k8s.io/kubernetes/pkg/controller
