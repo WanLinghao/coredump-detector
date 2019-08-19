@@ -44,5 +44,5 @@ type Storage interface {
 
 type Metadata struct {
 	GCTimeStamp   *time.Time `json:"gcTimeStamp"`
-	DownloadCount int        `json:donwloadCount`
+	DownloadCount int        `json:"donwloadCount"`
 }
