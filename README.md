@@ -16,6 +16,7 @@
 
 The bakcend storage is an dependent filesystem storage to store core files. This storage could be either ceph filesystem storage,
 nfs storage or any other filesystem storage.
+For test purpose, you can also use local host[https://kubernetes.io/docs/concepts/storage/volumes/#hostpath] storage to store core files.
 
 ### Core file generation
 
