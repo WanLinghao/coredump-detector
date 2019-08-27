@@ -1,0 +1,274 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: __NAMESPACE__
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: coredump-apiserver
+  namespace: __NAMESPACE__
+---
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1alpha1.coredump.fujitsu.com
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  version: v1alpha1
+  group: coredump.fujitsu.com
+  groupPriorityMinimum: 2000
+  service:
+    name: __SERVICE_NAME__
+    namespace: __NAMESPACE__
+  versionPriority: 10
+  caBundle: "__APISERVICE_CA_BUNDLE__"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: __SERVICE_NAME__
+  namespace: __NAMESPACE__
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    api: coredump
+    apiserver: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredump
+  namespace: __NAMESPACE__
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      api: coredump 
+  template:
+    metadata:
+      labels:
+        api: coredump
+        apiserver: "true"
+    spec:
+      serviceAccountName: coredump-apiserver
+      containers:
+      - name: gc
+        image: wlhtorresowen/fujitsu-coredump-gc:test
+        volumeMounts:
+        - name: coredump-backend
+          mountPath: /coredump-backend
+          readOnly: false
+        command:
+        - "./gc"
+        args:
+        - "--backend-kind=local"
+        - "--local-path=/coredump-backend"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 100m
+            memory: 300Mi
+      - name: apiserver
+        image: wlhtorresowen/fujitsu-coredump:v0.3
+        volumeMounts:
+        - name: apiserver-certs
+          mountPath: /apiserver.local.config/certificates
+          readOnly: true
+        - name: coredump-backend
+          mountPath: /coredump-backend
+          readOnly: true
+        command:
+        - "./apiserver"
+        args:
+        - "--etcd-servers=http://etcd-svc:2379"
+        - "--tls-cert-file=/apiserver.local.config/certificates/tls.crt"
+        - "--tls-private-key-file=/apiserver.local.config/certificates/tls.key"
+        - "--audit-log-path=-"
+        - "--audit-log-maxage=0"
+        - "--audit-log-maxbackup=0"
+        - "--local-path=/coredump-backend"
+        - "--backend-kind=local"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 100m
+            memory: 300Mi
+      volumes:
+      - name: apiserver-certs
+        secret:
+          secretName: servercrt
+      - name: coredump-backend
+        hostPath:
+          path: /tmp/coredump-backend-storage
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: etcd
+  namespace: __NAMESPACE__
+spec:
+  serviceName: "etcd"
+  selector:
+    matchLabels:
+      app: etcd
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: etcd
+    spec:
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: etcd-data-dir
+        hostPath:
+          path: /tmp/etcd-backend
+      containers:
+      - name: etcd
+        image: quay.io/coreos/etcd:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+          limits:
+            cpu: 200m
+            memory: 300Mi
+        env:
+        - name: ETCD_DATA_DIR
+          value: /etcd-data-dir
+        command:
+        - /usr/local/bin/etcd
+        - --listen-client-urls
+        - http://0.0.0.0:2379
+        - --advertise-client-urls
+        - http://localhost:2379
+        ports:
+        - containerPort: 2379
+        volumeMounts:
+        - name: etcd-data-dir
+          mountPath: /etcd-data-dir
+        readinessProbe:
+          httpGet:
+            port: 2379
+            path: /health
+          failureThreshold: 1
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            port: 2379
+            path: /health
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcd-svc
+  namespace: __NAMESPACE__
+  labels:
+    app: etcd
+spec:
+  ports:
+  - port: 2379
+    name: etcd
+    targetPort: 2379
+  selector:
+    app: etcd
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: servercrt
+  namespace: __NAMESPACE__
+  labels:
+    api: coredump
+    apiserver: "true"
+data:
+  tls.crt: __SERVICE_TLS_CRT__
+  tls.key: __SERVICE_TLS_KEY__
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: default-for-aggr
+rules:
+- apiGroups: ["authorization.k8s.io", "apps", "coredump.fujitsu.com", ""] # "" indicates the core API group
+  resources: ["subjectaccessreviews", "deployments", "mycontrollers","coredumpendpoints", "configmaps", "pods"]
+  verbs: ["get", "watch", "create", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: default-for-aggr-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: default-for-aggr
+subjects:
+- kind: ServiceAccount
+  name: coredump-apiserver
+  namespace: __NAMESPACE__
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kcdt-ds
+  namespace: __NAMESPACE__
+spec:
+  selector:
+    matchLabels:
+      name: kcdt-ds
+  template:
+    metadata:
+      labels:
+        name: kcdt-ds
+    spec:
+      containers:
+      - name: kcdt-container
+        image: fenggw/kcdt
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /kcdt/host
+          name: host-volume
+          mountPropagation: Bidirectional
+        - mountPath: /kcdt/host/core
+          name: coredump-backend
+        env:
+        - name: HOSTVOL
+          value: "/root"
+        command: ["/kcdt/init.sh"]
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/kcdt/cleanup.sh"]
+      volumes:
+      - name: host-volume
+        hostPath:
+          path: /root
+      - name: coredump-backend
+        hostPath:
+          path: /tmp/coredump-backend-storage
