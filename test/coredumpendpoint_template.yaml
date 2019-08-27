@@ -3,4 +3,4 @@ kind: CoredumpEndpoint
 metadata:
   namespace: __NAMESPACE__
   name: __NAME__
-spec:
+spec: __UID__

@@ -96,6 +96,7 @@ test_create_coredumpendpoint(){
     cp $COREDUMP_TEMPLATE $yaml_file
     sed -i "s/__NAMESPACE__/${namespace}/g" $yaml_file
     sed -i "s/__NAME__/${pod}/g" $yaml_file
+    sed -i "s/__UID__//g" $yaml_file
     create_via_file $yaml_file
 }
 
