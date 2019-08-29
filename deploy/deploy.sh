@@ -32,7 +32,7 @@ namespace=$1
 name=$2
 dir=$3
 
-if [! -d "$dir" ]; then
+if [ ! -d "$dir" ]; then
     mkdir $dir
     if [ $? -ne 0 ];then
         echo "create $dir failed"
@@ -48,13 +48,13 @@ cp ./apiserver_template.yaml $dir/apiserver.yaml
 
 api_svc_pem=$(extract_pem $dir/apiserver_ca.crt)
 echo $api_svc_pem
-replace_str __APISERVICE_CA_BUNDLE__ $api_svc_pem $dir/apiserver_template.yaml
+replace_str __APISERVICE_CA_BUNDLE__ $api_svc_pem $dir/apiserver.yaml
 
 svc_crt=$(extract_pem $dir/apiserver.crt)
-replace_str __SERVICE_TLS_CRT__ $svc_crt $dir/apiserver_template.yaml
+replace_str __SERVICE_TLS_CRT__ $svc_crt $dir/apiserver.yaml
 
 svc_key=$(extract_pem $dir/apiserver.key)
-replace_str __SERVICE_TLS_KEY__ $svc_key $dir/apiserver_template.yaml
+replace_str __SERVICE_TLS_KEY__ $svc_key $dir/apiserver.yaml
 
-replace_str __NAMESPACE__ $namespace $dir/apiserver_template.yaml
-replace_str __SERVICE_NAME__ $name $dir/apiserver_template.yaml
+replace_str __NAMESPACE__ $namespace $dir/apiserver.yaml
+replace_str __SERVICE_NAME__ $name $dir/apiserver.yaml

@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
 	"k8s.io/klog"
@@ -60,6 +61,11 @@ func (l *localStorage) GetCoreFiles(ns, podUID, container string) (string, error
 	if !stat.IsDir() {
 		return "", fmt.Errorf("got unexpected error: %s is a not a directory", coreDirPath)
 	}
+
+	tarStartT := time.Now()
+	defer func() {
+		klog.Infof("tar %s consumes %v", coreDirPath, time.Since(tarStartT))
+	}()
 
 	return makeTar(coreDirPath, "/tmp")
 }

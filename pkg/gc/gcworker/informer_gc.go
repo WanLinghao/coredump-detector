@@ -100,11 +100,10 @@ func (ig *InformerGC) Run(stopCh <-chan struct{}) {
 	klog.Infof("Starting core dump file inform cleaner")
 	defer klog.Infof("Shutting down core dump inform cleaner")
 
+	ig.kubeInformerFactory.Start(stopCh)
 	if !WaitForCacheSync("core dump file cleaner", stopCh, ig.podListerSynced, ig.nsListerSynced) {
 		return
 	}
-
-	ig.kubeInformerFactory.Start(stopCh)
 
 	for i := 0; i < ig.workers; i++ {
 		go wait.Until(ig.runBackendWorker, time.Second, stopCh)
@@ -242,7 +241,7 @@ func (ig *InformerGC) podDeleted(obj interface{}) {
 	}
 	currentTime := time.Now()
 	deletionTime := currentTime.Add(ig.gcThreshold)
-	klog.Infof("Detect pod deletion(%s/%s), execute gc job at %v", deletionTime)
+	klog.Infof("Detect pod deletion(%s/%s), execute gc job at %v", pod.Namespace, pod.Name, deletionTime)
 	ig.backendCleanQueue.AddAfter(ig.generateKey(pod.Namespace, pod.Name, string(pod.UID)), ig.gcThreshold)
 	ig.coredumpEndpointCleanQueue.AddAfter(ig.generateKey(pod.Namespace, pod.Name, string(pod.UID)), ig.gcThreshold)
 }

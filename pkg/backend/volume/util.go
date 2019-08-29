@@ -19,7 +19,6 @@ package volume
 import (
 	"archive/tar"
 	"compress/gzip"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -52,7 +51,6 @@ func makeTar(sourceDir, destBase string) (string, error) {
 }
 
 func compress(file *os.File, prefix string, tw *tar.Writer) error {
-	fmt.Printf("the name is %s, %#v the prefix is %s\n", file.Name(), file, prefix)
 	info, err := file.Stat()
 	if err != nil {
 		return err

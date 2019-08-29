@@ -52,7 +52,7 @@ metadata:
     api: coredump
     apiserver: "true"
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       api: coredump 
@@ -65,7 +65,7 @@ spec:
       serviceAccountName: coredump-apiserver
       containers:
       - name: gc
-        image: wlhtorresowen/fujitsu-coredump-gc:test
+        image: wlhtorresowen/fujitsu-coredump-gc:v0.2
         volumeMounts:
         - name: coredump-backend
           mountPath: /coredump-backend
@@ -216,7 +216,7 @@ metadata:
   name: default-for-aggr
 rules:
 - apiGroups: ["authorization.k8s.io", "apps", "coredump.fujitsu.com", ""] # "" indicates the core API group
-  resources: ["subjectaccessreviews", "deployments", "mycontrollers","coredumpendpoints", "configmaps", "pods"]
+  resources: ["subjectaccessreviews", "deployments", "mycontrollers","coredumpendpoints", "configmaps", "pods", "namespaces"]
   verbs: ["get", "watch", "create", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
