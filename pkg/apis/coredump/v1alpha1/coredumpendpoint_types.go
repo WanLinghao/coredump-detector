@@ -32,15 +32,15 @@ import (
 // +subresource:request=CoredumpEndpointDump,path=dump,kind=CoredumpEndpointDump
 type CoredumpEndpoint struct {
 	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	Spec   CoredumpEndpointSpec   `json:"spec,omitempty"`
-	Status CoredumpEndpointStatus `json:"status,omitempty"`
+	Spec   CoredumpEndpointSpec   `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	Status CoredumpEndpointStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
 
 // CoredumpEndpointSpec defines the desired state of CoredumpEndpoint
 type CoredumpEndpointSpec struct {
-	PodUID types.UID `json:"podUID,omitempty"`
+	PodUID types.UID `json:"podUID,omitempty" protobuf:"bytes,1,opt,name=podUID"`
 }
 
 // CoredumpEndpointStatus defines the observed state of CoredumpEndpoint

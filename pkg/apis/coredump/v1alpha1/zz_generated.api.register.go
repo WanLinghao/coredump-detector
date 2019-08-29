@@ -87,14 +87,14 @@ type CoredumpEndpointSchemeFns struct {
 
 type CoredumpEndpointList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []CoredumpEndpoint `json:"items"`
+	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	Items           []CoredumpEndpoint `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type CoredumpEndpointDumpList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []CoredumpEndpointDump `json:"items"`
+	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	Items           []CoredumpEndpointDump `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
