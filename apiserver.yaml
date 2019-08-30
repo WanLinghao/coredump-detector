@@ -1,0 +1,263 @@
+
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1alpha1.coredump.fujitsu.com
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  version: v1alpha1
+  group: coredump.fujitsu.com
+  groupPriorityMinimum: 2000
+  service:
+    name: coredump
+    namespace: default
+  versionPriority: 10
+  caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURvekNDQW91Z0F3SUJBZ0lKQU45WWdrUlNPNmJDTUEwR0NTcUdTSWIzRFFFQkN3VUFNR2d4Q3pBSkJnTlYKQkFZVEFuVnVNUXN3Q1FZRFZRUUlEQUp6ZERFS01BZ0dBMVVFQnd3QmJERUtNQWdHQTFVRUNnd0JiekVMTUFrRwpBMVVFQ3d3Q2IzVXhKekFsQmdOVkJBTU1IbU52Y21Wa2RXMXdMV05sY25ScFptbGpZWFJsTFdGMWRHaHZjbWwwCmVUQWVGdzB4T1RBMU16QXdNelF6TVRaYUZ3MHlNREExTWprd016UXpNVFphTUdneEN6QUpCZ05WQkFZVEFuVnUKTVFzd0NRWURWUVFJREFKemRERUtNQWdHQTFVRUJ3d0JiREVLTUFnR0ExVUVDZ3dCYnpFTE1Ba0dBMVVFQ3d3QwpiM1V4SnpBbEJnTlZCQU1NSG1OdmNtVmtkVzF3TFdObGNuUnBabWxqWVhSbExXRjFkR2h2Y21sMGVUQ0NBU0l3CkRRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFKbnRobzVUemtOelgzTHBHdkQza0JCV3Voc0UKTEd5cDN6cDlrWlhtbFcwNmFHZno5TnNWSmhpR1ZYbUNuMUIvbjQrQ2QxYlRIMUVlZlF5bzh1L3JYc2R4bnlObgpnS3RvMlJ6ZFNCbmdQOTc1ZkVrOS8wS0xhUURuOHJlZHZ3cTJUejBOZ0lycmtFK1Z0bWFFWXhXNmdOWTkzUXJLCms5NnVFVmJCYUZDcDY5bHRRWTN3bmdOTTVKbmZpc2xtaVNwOWRhY1FnY3FicHI5a203Z2hSZVpld2d0Y3ZnQlMKZmtnSWpkTUd4TTYvRStxb3hSRWlEaEJ1MmpIWU10NThEekpQeHM4MVVGaXk0RzhEM2FaZmQyRVRPNFlIRERNZgpNQ3hmNDd6dERPRnJUY3dqd0R5aGVNakJLL0p5M2VZT3N3MmxxZG1aT0VqczF4RnNNN2xIT2VaMlU3OENBd0VBCkFhTlFNRTR3SFFZRFZSME9CQllFRk9YOTFYMEdmWHJCQ3RsZ3ZDZW0rek5yTFhQb01COEdBMVVkSXdRWU1CYUEKRk9YOTFYMEdmWHJCQ3RsZ3ZDZW0rek5yTFhQb01Bd0dBMVVkRXdRRk1BTUJBZjh3RFFZSktvWklodmNOQVFFTApCUUFEZ2dFQkFBM2crN05IaUsxUS9Uek9IN0l3RWlFOTBBWUZiVldHZWRoWFFlSk9UYmJzbUs3QU1IVi84a1BKCktpaGJOT3ZuNi9zbDZMU3dhMG9HemhNZnZqcGNNQWpRYkVpVTJod3FLOHNlSTNFTUlvSmxZU3RrZmFNYXdYWGcKRSs4eFI0ZzNlK2NFR0d5bUZVbVB6NFZsNmxGOVVrRlpwZ2luREY1Sndobks5bmJ1bzZ4U2RKa001UVU1ank2agpEWUs2VEhUQ0VmN01yMzJKdUtaT2hua2NzNVM2QUo5UTJ0blRubzNUZDB6M0ZxU2t2Ym8vQitOVHJIMVpsTXBkCmFiUU84WjQzc1d6VWQwQWt6ZjlWeDV3bmNMamczUGtoRURyeCtjYUVyZnJ0Y2VqSGxmSFR5V3U4cGV3M08zQVIKRUpYMnJmdnl1Zldadk9sTEdMRGQzTjEyT1NXenp4RT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredump
+  namespace: default
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    api: coredump
+    apiserver: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredump
+  namespace: default
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      api: coredump 
+  template:
+    metadata:
+      labels:
+        api: coredump
+        apiserver: "true"
+    spec:
+      containers:
+      - name: gc
+        image: wlhtorresowen/fujitsu-coredump-gc:test
+        volumeMounts:
+        - name: coredump-backend
+          mountPath: /coredump-backend
+          readOnly: false
+        command:
+        - "./gc"
+        args:
+        - "--backend-kind=local"
+        - "--local-path=/coredump-backend"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 100m
+            memory: 300Mi
+      - name: apiserver
+        image: wlhtorresowen/fujitsu-coredump:v0.3
+        volumeMounts:
+        - name: apiserver-certs
+          mountPath: /apiserver.local.config/certificates
+          readOnly: true
+        - name: coredump-backend
+          mountPath: /coredump-backend
+          readOnly: true
+        command:
+        - "./apiserver"
+        args:
+        - "--etcd-servers=http://etcd-svc:2379"
+        - "--tls-cert-file=/apiserver.local.config/certificates/tls.crt"
+        - "--tls-private-key-file=/apiserver.local.config/certificates/tls.key"
+        - "--audit-log-path=-"
+        - "--audit-log-maxage=0"
+        - "--audit-log-maxbackup=0"
+        - "--local-path=/coredump-backend"
+        - "--backend-kind=local"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 100m
+            memory: 300Mi
+      volumes:
+      - name: apiserver-certs
+        secret:
+          secretName: coredump
+      - name: coredump-backend
+        hostPath:
+          path: /tmp/coredump-backend-storage
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: etcd
+  namespace: default
+spec:
+  serviceName: "etcd"
+  selector:
+    matchLabels:
+      app: etcd
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: etcd
+    spec:
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: etcd-data-dir
+        hostPath:
+          path: /tmp/etcd-backend
+      containers:
+      - name: etcd
+        image: quay.io/coreos/etcd:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+          limits:
+            cpu: 200m
+            memory: 300Mi
+        env:
+        - name: ETCD_DATA_DIR
+          value: /etcd-data-dir
+        command:
+        - /usr/local/bin/etcd
+        - --listen-client-urls
+        - http://0.0.0.0:2379
+        - --advertise-client-urls
+        - http://localhost:2379
+        ports:
+        - containerPort: 2379
+        volumeMounts:
+        - name: etcd-data-dir
+          mountPath: /etcd-data-dir
+        readinessProbe:
+          httpGet:
+            port: 2379
+            path: /health
+          failureThreshold: 1
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            port: 2379
+            path: /health
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcd-svc
+  namespace: default
+  labels:
+    app: etcd
+spec:
+  ports:
+  - port: 2379
+    name: etcd
+    targetPort: 2379
+  selector:
+    app: etcd
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: coredump
+  namespace: default
+  labels:
+    api: coredump
+    apiserver: "true"
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURRakNDQWlvQ0NRQ29SSGo2bGNZWFZEQU5CZ2txaGtpRzl3MEJBUXNGQURCb01Rc3dDUVlEVlFRR0V3SjEKYmpFTE1Ba0dBMVVFQ0F3Q2MzUXhDakFJQmdOVkJBY01BV3d4Q2pBSUJnTlZCQW9NQVc4eEN6QUpCZ05WQkFzTQpBbTkxTVNjd0pRWURWUVFEREI1amIzSmxaSFZ0Y0MxalpYSjBhV1pwWTJGMFpTMWhkWFJvYjNKcGRIa3dIaGNOCk1Ua3dOVE13TURNME16RTJXaGNOTWpBd05USTVNRE0wTXpFMldqQmVNUXN3Q1FZRFZRUUdFd0oxYmpFTE1Ba0cKQTFVRUNBd0NjM1F4Q2pBSUJnTlZCQWNNQVd3eENqQUlCZ05WQkFvTUFXOHhDekFKQmdOVkJBc01BbTkxTVIwdwpHd1lEVlFRRERCUmpiM0psWkhWdGNDNWtaV1poZFd4MExuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFECmdnRVBBRENDQVFvQ2dnRUJBSmNqWVQwMTUrNEJadzVvQ3g3OHI2TUZLVnJ6VDBaa25HQzA0NExRaEpLUGJVMGMKTDBJbklmd1lIaFZaOWFlcEc0Tm41RkdZdDVEV3ZIbXVwRzRkMFdLazNyVnRRN0g2aWx4Y05nVHVwbUlDUjZ3TgorWTNZSDBPZHNIWThmQm0zU1dtWHQxOFNZcG00dWNzbUxCUFFGWXErZnhLbDNwTWQ2QU9LT3FFdTRQRmlPZTdPCmxrZmg5TUV2NXFXMmxYWFpNTzBYYmE5aXBSekJlK0pVOVpOV3ZDS2hIS3VvYktpcXZtWUdiMXRjK3UwMDZGZkIKRHk3aDUzWU5Xb1NWcTN6VjA0dk1ETjJXejRGaXI0NEFQbFpYc1ZSWm9uVGE2aXBOK05XV1lNMkpieFRaemM3awpCVThTaEluSk51RHNubDZ3UExrVzk3MmpZdzlqZlJlTEZuUHpwOE1DQXdFQUFUQU5CZ2txaGtpRzl3MEJBUXNGCkFBT0NBUUVBRzFUcE4raUFTN05FVzFZMHF0S0xXVTVYZXN4dUErK0JvQlZZZTRrWWpadUpmQ2ZaTFRId2RqL0gKTS81VEtLS21zUmVtNWJHTUlzQnVJTmxIM05nV1VZbk9Qa3JGby9FMlNKRkxBS2RUSEZtREtKVG1wUysxV3lEMQpZSjViRFRFOFd6Q2xFS1g2TkZUQjIrdGIxVENNOVlGUTZUbEliRTAyYUptaTJwa2ZoUG9ZQ2I5a09yWTVTQzlyCjIvbVZFWFlkd0xDeVRzek0vTXd0OWpOOGhHRGxhYlJkRUxPSldZdWVISVVmaWtjVGh5ZkNBK0ZvdFJFZjMzSHQKNW0wUDBSSGFlMzdtdnZKbnRLUFhReUZJc2M5eFJvMHFrS2tJRjAzbXBPZXFhRHFPMXptTCtPOUI4RjZ4bDNncApuekE2ZTM1cmZqQmg3UDMrdWdvTW1sekpJK0lHZHc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRQ1hJMkU5TmVmdUFXY08KYUFzZS9LK2pCU2xhODA5R1pKeGd0T09DMElTU2oyMU5IQzlDSnlIOEdCNFZXZlducVJ1RForUlJtTGVRMXJ4NQpycVJ1SGRGaXBONjFiVU94K29wY1hEWUU3cVppQWtlc0RmbU4yQjlEbmJCMlBId1p0MGxwbDdkZkVtS1p1TG5MCkppd1QwQldLdm44U3BkNlRIZWdEaWpxaEx1RHhZam51enBaSDRmVEJMK2FsdHBWMTJURHRGMjJ2WXFVY3dYdmkKVlBXVFZyd2lvUnlycUd5b3FyNW1CbTliWFBydE5PaFh3UTh1NGVkMkRWcUVsYXQ4MWRPTHpBemRscytCWXErTwpBRDVXVjdGVVdhSjAydW9xVGZqVmxtRE5pVzhVMmMzTzVBVlBFb1NKeVRiZzdKNWVzRHk1RnZlOW8yTVBZMzBYCml4Wno4NmZEQWdNQkFBRUNnZ0VBQkdadlNrenJkNjVxeGF5Wnhra3RBOTMrbWp0REw1VjJTQXA4SlM3VTdUOW4KdXpyNjFUNDJheFI0cTc1MnZHN2I4ak53SGtBSCtCdUlXVEtRYnZSSFNFdnNmL095YU5nV2R5SG9JTFNoKzNCOQpqYkRLZHlxM25reFUrdHcvOEsrNVgyMmZWUkUvOWFHL0p2N3hnWklwVG1URlpsR1Y3VXFObXF6SGtESEJNc1hSCjNkZHgyNDc4bkl4Zlc2K25UN2J2ZFFCVEt5RENhMXZSeUVnRmF1SCsyWUpzVDNsSUhLKzdGM2tFTXdFT2tkckgKVGJ0NndPL0dYeTE0Q3QxKzZJZmpnbEtsKzR0Mk1pSFQwMUVwT3ZpL0ZHQTNkSFV5U2ZWTFgvVDJmWUx3Q2FCVApMMmExR2lVenlDMEhqaG1JU28wbFlOcy8wcEQvY3BrSUZxdy9Wa0paZ1FLQmdRREZ2OGxnMFhTcHhDVnhXYlkrCkd6MDVLZFIva0dDSEtEQ1RVWHNERnNJallKdml0OEgzSE1zYy8wd0pxeW4wM2xtWU5uVjU4WGM0T3JqUTFKeWwKZThmcERGdnQ1MmYwL0NCVE5PWkRiQVg1dmY3L3BrcFpCM3dTOTBDNk90SmpoZ2VEVGowL01oQnhmakVqZDhsaQprMHcrbC8wOEE0eXNiU2ZsMXRiQzNHUEJjd0tCZ1FERHFLd290MEM1bThTemkzYU1DTHMwOUNFWWw4WE01ay9RCjhDUElQRUcyNFBvL21nOU5rVUx5akVnZ2MrdjRRQTBSemtXZFBBRU13WVlFaTBXSUpiWGsxWTRpYkpqaVcyVDcKbHptU1BsQmVXTHE1eTBIWGpqYWR5TkplM0pZWmI2VVpzMklDcFFSL3p0Ym5oT1pFWHNsdm8yNXdXTmFUemFQaQpiYjIzbmNhc2NRS0JnQTQ3b0pYc1hYWStuT2RNcXJaTHBadHdyRS9HSjN4eTR4UW5ZREEzdWg5cnU2eVV4MHd1CjhWdVQ4SGdkcnJabUxwS3JFTWVISHFxWVoyYjRkcEhlbCtQcE5OQ3B3Q3k4M09MQVF2YUZWdVREelErL2UwaHYKSm5vQys5Q3JuU3Iyb2FITXh0RyttN3BmZDgveXRqYjNIUnpBT2NUUkNKWDhnVXVrcSs1NGlHR0xBb0dCQUxSRQp6Z25kZlhjRmU1L3BHTnBBbVN0YTJydHI2c1MwVmttdFYycC9paFJUQ0g1ZEZVaGtWQWhoRTN0REV1QnhNeGw2CnNVMERJZng4dVZ1cWJlL1l2dFFOcHAwMDdVOXc0WU9rZTFpd3JSK2dKTHBWK1YzL0czY1l0aXJNbGtidFJISi8KZ2dmcHZsRjdZeW1BbXgvWExVVDhrUjVWMjYzbVE5NjFPWnpaYzFraEFvR0FCSlg4ejJnaUdNaWNxYkZVUkdFYwpLNUhpYUx1OGZOYjBqMWI2TGdhZHdaMUhmQUVqbnd1SDUxUFNxYWk5cWdYT2tOZnA4bXRFUWJJaGFHL09UVjliCnZ2bEwvRlBYTUE1dVBPdCs0NnluRlBxSzFyc3RUZnIvbHR2WE4xcFJXQ3VvSU11eHJNbCt1Kzc4MFBrL0ljbnQKd2N2eHI2TVZtaFI1OTR0SG02VGYxOGc9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: default-for-aggr
+rules:
+- apiGroups: ["authorization.k8s.io", "apps", "coredump.fujitsu.com", ""] # "" indicates the core API group
+  resources: ["subjectaccessreviews", "deployments", "mycontrollers","coredumpendpoints", "configmaps", "pods"]
+  verbs: ["get", "watch", "create", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: default-for-aggr-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: default-for-aggr
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kcdt-ds
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      name: kcdt-ds
+  template:
+    metadata:
+      labels:
+        name: kcdt-ds
+    spec:
+      containers:
+      - name: kcdt-container
+        image: fenggw/kcdt
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /kcdt/host
+          name: host-volume
+          mountPropagation: Bidirectional
+        - mountPath: /kcdt/host/core
+          name: coredump-backend
+        env:
+        - name: HOSTVOL
+          value: "/root"
+        command: ["/kcdt/init.sh"]
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/kcdt/cleanup.sh"]
+      volumes:
+      - name: host-volume
+        hostPath:
+          path: /root
+      - name: coredump-backend
+        hostPath:
+          path: /tmp/coredump-backend-storage

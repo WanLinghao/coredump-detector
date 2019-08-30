@@ -1,0 +1,186 @@
+
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1alpha1.coredump.fujitsu.com
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  version: v1alpha1
+  group: coredump.fujitsu.com
+  groupPriorityMinimum: 2000
+  service:
+    name: coredump
+    namespace: default
+  versionPriority: 10
+  caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURvekNDQW91Z0F3SUJBZ0lKQVBEYzZhY2Y1M1c4TUEwR0NTcUdTSWIzRFFFQkN3VUFNR2d4Q3pBSkJnTlYKQkFZVEFuVnVNUXN3Q1FZRFZRUUlEQUp6ZERFS01BZ0dBMVVFQnd3QmJERUtNQWdHQTFVRUNnd0JiekVMTUFrRwpBMVVFQ3d3Q2IzVXhKekFsQmdOVkJBTU1IbU52Y21Wa2RXMXdMV05sY25ScFptbGpZWFJsTFdGMWRHaHZjbWwwCmVUQWVGdzB4T1RBNE1qY3dOak01TkRGYUZ3MHlNREE0TWpZd05qTTVOREZhTUdneEN6QUpCZ05WQkFZVEFuVnUKTVFzd0NRWURWUVFJREFKemRERUtNQWdHQTFVRUJ3d0JiREVLTUFnR0ExVUVDZ3dCYnpFTE1Ba0dBMVVFQ3d3QwpiM1V4SnpBbEJnTlZCQU1NSG1OdmNtVmtkVzF3TFdObGNuUnBabWxqWVhSbExXRjFkR2h2Y21sMGVUQ0NBU0l3CkRRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFObTRSRzlWek05K2lSL1crRnpxNis4NEM3Nk0KWWRQTUhpajZIM2dOUi9GakJvdG9hWnUwNGRmVXlUbVMwSHV5c1lXeWR1S2J0U0FNclNpdUNiYVZJU2ZJUjlrUApUb09USjM0QXVNSXVVQmdCY1RSajRoa1JIRzFhMUluVFFlWjZHd1hSdFl4ek5iZ3lKYXE1YUdUZ0ZsSTBYRkcyCk51eDB4aEMwSXJzd3IrakNoZkFoU3U2WE5EeVNJWE12cm5FTTRMNk4xTzBxK1lqUGI3Q0Y1emd6SUNGeVcwdjcKQUlySzNRajVGbW5CQzVnSlhsTUhKM1Y5R09IUEFubDBXMXBJdis5dmI2VDhveEk3aFcyWEFoaXZkd2VWM0FaaApBYlRHU3l2bjBldXBFMVEzMlBReEZTNkhBWmlPUEpZSmJVWjJSMjltbEpvQThNK1puN0lFd2xvVmowVUNBd0VBCkFhTlFNRTR3SFFZRFZSME9CQllFRk5DKzZWdnRaVlExMlBzV2lwRzNhVDVzdUJwTE1COEdBMVVkSXdRWU1CYUEKRk5DKzZWdnRaVlExMlBzV2lwRzNhVDVzdUJwTE1Bd0dBMVVkRXdRRk1BTUJBZjh3RFFZSktvWklodmNOQVFFTApCUUFEZ2dFQkFFb0FMWThiSnlNZ3RYVk51STEzbkI5eUk0WmcrZUJsTkJHUURUYWR4UFJzUjdabDdERUV1NmhXCmQ3cTErTXEreTY2K2VVVHRONEt6M2Q1Z0lBeGV1T2taWXZGRnpPdlB1QUZsVWZWRnFNNkxvbG0yWHZPOHU4V3YKSmU3OVY4bUZNbEVtUHQ1NzNzVk5DTDhmeDBTVlY2VnFaOEhKWEVSSnZueTFOeUc3YUVmaDBDWkVubm1xY21RYwpiVHVmV2JMc2Zmd3BTejhiYkxsMkozMVZOd3gwNWdCcWduOTRJMnRqOTdpK1dBRUhxSk4wa3dONFhXdDk2TkRYCnRyMXFNakNFRmVDZmg4VXo2ZXNUSysrckEyeVNUUDN6OUkrblhpWW9YZHpuR1c0YlF5WTQzRGM3MlQvbUptTXcKQlVrdGtERENjV2JiZ3h4aGJ0MXh2WDVRUDNaRyt4TT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredump
+  namespace: default
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    api: coredump
+    apiserver: "true"
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: coredump
+  namespace: default
+  labels:
+    api: coredump
+    apiserver: "true"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        api: coredump
+        apiserver: "true"
+    spec:
+      containers:
+      - name: apiserver
+        image: ddd
+        volumeMounts:
+        - name: apiserver-certs
+          mountPath: /apiserver.local.config/certificates
+          readOnly: true
+        command:
+        - "./apiserver"
+        args:
+        - "--etcd-servers=http://etcd-svc:2379"
+        - "--tls-cert-file=/apiserver.local.config/certificates/tls.crt"
+        - "--tls-private-key-file=/apiserver.local.config/certificates/tls.key"
+        - "--audit-log-path=-"
+        - "--audit-log-maxage=0"
+        - "--audit-log-maxbackup=0"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 30Mi
+      - name: controller
+        image: ddd
+        command:
+        - "./controller-manager"
+        args:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 30Mi
+      volumes:
+      - name: apiserver-certs
+        secret:
+          secretName: coredump
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: etcd
+  namespace: default
+spec:
+  serviceName: "etcd"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: etcd
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: etcd
+        image: quay.io/coreos/etcd:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 30Mi
+        env:
+        - name: ETCD_DATA_DIR
+          value: /etcd-data-dir
+        command:
+        - /usr/local/bin/etcd
+        - --listen-client-urls
+        - http://0.0.0.0:2379
+        - --advertise-client-urls
+        - http://localhost:2379
+        ports:
+        - containerPort: 2379
+        volumeMounts:
+        - name: etcd-data-dir
+          mountPath: /etcd-data-dir
+        readinessProbe:
+          httpGet:
+            port: 2379
+            path: /health
+          failureThreshold: 1
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            port: 2379
+            path: /health
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+  volumeClaimTemplates:
+  - metadata:
+     name: etcd-data-dir
+     annotations:
+        volume.beta.kubernetes.io/storage-class: standard
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+         storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcd-svc
+  namespace: default
+  labels:
+    app: etcd
+spec:
+  ports:
+  - port: 2379
+    name: etcd
+    targetPort: 2379
+  selector:
+    app: etcd
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: coredump
+  namespace: default
+  labels:
+    api: coredump
+    apiserver: "true"
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURRakNDQWlvQ0NRQ1R4cVVkZGhjdTN6QU5CZ2txaGtpRzl3MEJBUXNGQURCb01Rc3dDUVlEVlFRR0V3SjEKYmpFTE1Ba0dBMVVFQ0F3Q2MzUXhDakFJQmdOVkJBY01BV3d4Q2pBSUJnTlZCQW9NQVc4eEN6QUpCZ05WQkFzTQpBbTkxTVNjd0pRWURWUVFEREI1amIzSmxaSFZ0Y0MxalpYSjBhV1pwWTJGMFpTMWhkWFJvYjNKcGRIa3dIaGNOCk1Ua3dPREkzTURZek9UUXhXaGNOTWpBd09ESTJNRFl6T1RReFdqQmVNUXN3Q1FZRFZRUUdFd0oxYmpFTE1Ba0cKQTFVRUNBd0NjM1F4Q2pBSUJnTlZCQWNNQVd3eENqQUlCZ05WQkFvTUFXOHhDekFKQmdOVkJBc01BbTkxTVIwdwpHd1lEVlFRRERCUmpiM0psWkhWdGNDNWtaV1poZFd4MExuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFECmdnRVBBRENDQVFvQ2dnRUJBT0M4RVYzTlZ1MXh3ZVZmVUdNUmhDSVZhVHJUZHFjNmZyN01RUDNkZVllSHQycVQKQ1E2d3NBYmJmQXVZeVVDS3N2ZjhEemZhQU8vN1h1SDVlbS9BMWhnOFZ6VWFVVlRDNEFRT1Axdk1iZm13MEVvRApRWU82SGh4TmF4bmtqRjRGRTdic2FQMVpGWTFueUU4eFhnS1Jpd0pvY3NSRU0zdDVLZzVDZWcyTGZqV2tJbjBHCi90eHdTWFZFS09OVlRGbnVEUlRjTFNZd1F5V2pFNFYwK2cwSE9SVnUvTU9KekYxRmV5TEJ6T1hlTFg0aGlCcjYKUFp3MFVlRGd5ZUNEUnhBRnp2OEVJNWMwZUpydlR0Wm11WXVzNEU1YzYrcmdxRWtyTW1BeUJJbXJabnRvc2JwMApJUWxOZUdlZ1dDQkM1dmNDUXpNL3FsWjcxVEZ0WGZ0dVlDTXZadnNDQXdFQUFUQU5CZ2txaGtpRzl3MEJBUXNGCkFBT0NBUUVBSzNWSTEzOWVqb2hIMjcvS2NlR1ZmVTJhZnV5N1MvS3ZUZExEa2dyR3FPMTEwSFpVRDlRMjRKRDAKWlY3VVNUanNEa0NMOXRIRlhhUnNMY1dNazNSZUhhRGRVZUIvMTBQUXpDc3hLdC9EaDNjNWhHYVNVTk9pbVVEZgp6c3UrOFZiS0FIRTM3a0VhWU03Ri9DSTlLYWF2STdpZm5zMXhBOWY2aFBnalJ5MFY3Wnpvb1JrdTVDeG1USXRyCnBlVVJWbXRvVTZtQ1Q2d0Q5V1dKUll1N09JYjBYeTJiZ29lMnlJQnlwQnpPTHRQeUYwbHNSODhXRlpKL3ZyQkMKb2xydWVZRWpPRndIdnB6cWpUYVhJeTc4T2Y2amV6SytiV0dXbU00bzlZU0Y0ZHp3SlByeExVQjdFdVo4WSs0Rwp6RW5iNXhIajhFcUUxTzBTSmpyWUxhYjhuWU96ZUE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRRGd2QkZkelZidGNjSGwKWDFCakVZUWlGV2s2MDNhbk9uNit6RUQ5M1htSGg3ZHFrd2tPc0xBRzIzd0xtTWxBaXJMMy9BODMyZ0R2KzE3aAorWHB2d05ZWVBGYzFHbEZVd3VBRURqOWJ6RzM1c05CS0EwR0R1aDRjVFdzWjVJeGVCUk8yN0dqOVdSV05aOGhQCk1WNENrWXNDYUhMRVJETjdlU29PUW5vTmkzNDFwQ0o5QnY3Y2NFbDFSQ2pqVlV4WjdnMFUzQzBtTUVNbG94T0YKZFBvTkJ6a1ZidnpEaWN4ZFJYc2l3Y3psM2kxK0lZZ2ErajJjTkZIZzRNbmdnMGNRQmM3L0JDT1hOSGlhNzA3Vwpacm1Mck9CT1hPdnE0S2hKS3pKZ01nU0pxMlo3YUxHNmRDRUpUWGhub0ZnZ1F1YjNBa016UDZwV2U5VXhiVjM3CmJtQWpMMmI3QWdNQkFBRUNnZ0VBRWFMUW5oTGFLb0lOM0VreGpzUzJJTktiVW5GNzB6M0U2b1l1NTMwMDUwemcKT08zVy9SOGlnVGRDTWNySXFGYjZHbm5lVzl5d3pDUm0yc2J3TThyblFqbWlBbG5SWGh4NDVmaVVRa2oxckcyUwp1dXdzZlFEakVnZUZTeC9qWUJGMzdaZjUyVC9mY0J4ZjNNOGIrSW1oWmd2NlRhcW9lNTBUanREcXNSdHNTUnMxCm83NnQ1RWZBUitPVytrU3dXRVpXcDNMQSs0MUY1bTRlKzF4MWVmZ1RHT0cvZmhFeDFaS21aQ1VPZzdpdy9hTmcKQmw3ZHdyNDZ1MnkwVDloNmZmRXZkVTM2ckpzMDFSRDhqekRYOUE4WFVucnNPMEdMeEpsNEIya1hCZ1FEcnh2ZwplaHoyTWE2QVJ6b1FueXFaZW5aZC9ZRWYzL3dJRXN2d2Y4eGtpU0NUNlFLQmdRRDhZSW9MbFFraFB5WmpQdnJuCk5JdWlaKzZORXUyOElxL0xWNEVSNnFPNVUvK0ZRSzB5YXh2QVBwa2RramNVMkxpbGRVV3lFWVNVcWhBR3NZUkMKSE5kZU1YVzJCTk1iLzBDTUhGVTRrb3Y1RGhDMGZnL2NZZkNraWhGbzBqVnp1aGRwb0dicmVZZVpjcHMzank1YwpJWm1BRXZQelpKcnVMZHZPUUl1a2RENTNOUUtCZ1FEajlmSCtJZGJ0UzBjWDFIUW1GTVpmQ2Rjbm1lUnRjUFNCCmYzYnRJL1ErMlc5eXZlbC9rM2JWNFZsaUZiaDdpUkdZSlFubnNvSVNET0hNa0Y2Ri84cDRQcm5pUks5d1o5TWQKdFpHRmdmWXRHOWxsanhLbVE5bk9wcnY5RXZLbk1EMjllWm0yYzFEbC9UZFBNaGlLeCtDelp6aXVZTHcyM1NQOQpKczVvWWE2N2J3S0JnQU9HQ1lkZDNsSERndkt4eDJrQTk4NGRxMXYyM3JEWXZ5R1VxQzJxMi94VGF1YmVYMHlyCjZDaEg5M1ZOUEUyak5QakNhV1d5RHVyUWNRYlc1YVRTcUVNZFo2cFI2T3lrSksrUUdiUi9mMHJMNG5uU3BNQUwKOGdNcUZsSWpWVEczY0dvK0hoRzlrYUlYMG9qMUM4Mm5mbkFtVTVlYldQcG9VNEJPc0dSc1p3N2RBb0dCQU53Mwp5U29XNkxsZUluVEw0ZFN6OXhyeXQ2M2pCZ0FQd2JTa1BYQkRibjJVc2d4bm1IMk5LSnpmME9oblVVdk9FM2dtCk45Wmo1VEdvemkwL1BvRTJwUkxhamRvZlBsaFpoR0pMK0NQQWMrQUo2azhwRXZ3WnlmelBxQVdJVzIvVnM1OHEKTEt0TDVWZjQ4WWlKUFpvOEV6OWN0UzRIOTJzTTRPcDZwYVhDei9qekFvR0FWZ3J0TnEvTnJ3TEQ5SkJWRXN3VQpZZ0h2SFd3TDBwRlRpZGc2ZmdBZ1d6azdQSk9WZVduN1ZjdjVrYzVSRUlLdTBQS1h3SGZ5NkwrQVVOM2RBN3JLClJQTGZoZGtTRzAvS3EzUkNXK1BlZDU2ZjlNakJiaXR1UzFRSHhIcVlIS1J0R1dvRG9OS2lIRzR1TG9RNHdOcXUKZnVIUlFnMndqUTJzbVlMRVd4b3RmQ3M9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
