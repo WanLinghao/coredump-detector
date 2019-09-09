@@ -19,7 +19,7 @@ package coredumpendpoint
 import (
 	"context"
 
-	coredumpv1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1"
+	coredumpv1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"

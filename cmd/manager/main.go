@@ -20,9 +20,9 @@ import (
 	"flag"
 	"os"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/apis"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/controller"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/webhook"
+	"github.com/WanLinghao/coredump-detector/pkg/apis"
+	"github.com/WanLinghao/coredump-detector/pkg/controller"
+	"github.com/WanLinghao/coredump-detector/pkg/webhook"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"

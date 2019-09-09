@@ -27,7 +27,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
+	"github.com/WanLinghao/coredump-detector/pkg/backend/types"
 )
 
 type awsStorage struct {

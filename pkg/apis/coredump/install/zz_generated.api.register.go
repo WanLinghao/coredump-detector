@@ -19,7 +19,7 @@ limitations under the License.
 package install
 
 import (
-	"github.com/WanLinghao/fujitsu-coredump/pkg/apis"
+	"github.com/WanLinghao/coredump-detector/pkg/apis"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )

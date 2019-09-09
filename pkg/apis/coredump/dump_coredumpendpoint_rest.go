@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/stream"
+	"github.com/WanLinghao/coredump-detector/pkg/stream"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/rest"

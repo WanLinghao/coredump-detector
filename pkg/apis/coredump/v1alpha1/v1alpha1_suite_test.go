@@ -24,9 +24,9 @@ import (
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/rest"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/apis"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/openapi"
+	"github.com/WanLinghao/coredump-detector/pkg/apis"
+	"github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset"
+	"github.com/WanLinghao/coredump-detector/pkg/openapi"
 )
 
 var testenv *test.TestEnvironment

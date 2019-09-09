@@ -19,9 +19,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset"
-	coredumpv1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset/typed/coredump/v1alpha1"
-	fakecoredumpv1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset/typed/coredump/v1alpha1/fake"
+	clientset "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset"
+	coredumpv1alpha1 "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset/typed/coredump/v1alpha1"
+	fakecoredumpv1alpha1 "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset/typed/coredump/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"

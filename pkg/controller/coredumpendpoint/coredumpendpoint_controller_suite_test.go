@@ -22,7 +22,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/apis"
+	"github.com/WanLinghao/coredump-detector/pkg/apis"
 	"github.com/onsi/gomega"
 	"github.com/yue9944882/apiserver-builder-alpha/pkg/test/suite"
 	"k8s.io/client-go/kubernetes/scheme"

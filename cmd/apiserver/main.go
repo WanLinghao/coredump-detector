@@ -24,10 +24,10 @@ import (
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/cmd/server"
 	_ "k8s.io/client-go/plugin/pkg/client/auth" // Enable cloud provider auth
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/apis"
-	backend "github.com/WanLinghao/fujitsu-coredump/pkg/backend/options"
-	gc "github.com/WanLinghao/fujitsu-coredump/pkg/gc/options"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/openapi"
+	"github.com/WanLinghao/coredump-detector/pkg/apis"
+	backend "github.com/WanLinghao/coredump-detector/pkg/backend/options"
+	gc "github.com/WanLinghao/coredump-detector/pkg/gc/options"
+	"github.com/WanLinghao/coredump-detector/pkg/openapi"
 	"github.com/spf13/cobra"
 )
 

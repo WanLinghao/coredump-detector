@@ -19,8 +19,8 @@ limitations under the License.
 package coredump
 
 import (
-	v1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/client/informers_generated/externalversions/coredump/v1alpha1"
-	internalinterfaces "github.com/WanLinghao/fujitsu-coredump/pkg/client/informers_generated/externalversions/internalinterfaces"
+	v1alpha1 "github.com/WanLinghao/coredump-detector/pkg/client/informers_generated/externalversions/coredump/v1alpha1"
+	internalinterfaces "github.com/WanLinghao/coredump-detector/pkg/client/informers_generated/externalversions/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.

@@ -21,10 +21,10 @@ package v1alpha1
 import (
 	time "time"
 
-	coredumpv1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1"
-	clientset "github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset"
-	internalinterfaces "github.com/WanLinghao/fujitsu-coredump/pkg/client/informers_generated/externalversions/internalinterfaces"
-	v1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/client/listers_generated/coredump/v1alpha1"
+	coredumpv1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
+	clientset "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset"
+	internalinterfaces "github.com/WanLinghao/coredump-detector/pkg/client/informers_generated/externalversions/internalinterfaces"
+	v1alpha1 "github.com/WanLinghao/coredump-detector/pkg/client/listers_generated/coredump/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"

@@ -19,8 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/k8sclient"
+	"github.com/WanLinghao/coredump-detector/pkg/apis/coredump"
+	"github.com/WanLinghao/coredump-detector/pkg/k8sclient"
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

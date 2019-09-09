@@ -23,9 +23,9 @@ import (
 	sync "sync"
 	time "time"
 
-	clientset "github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset"
-	coredump "github.com/WanLinghao/fujitsu-coredump/pkg/client/informers_generated/externalversions/coredump"
-	internalinterfaces "github.com/WanLinghao/fujitsu-coredump/pkg/client/informers_generated/externalversions/internalinterfaces"
+	clientset "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset"
+	coredump "github.com/WanLinghao/coredump-detector/pkg/client/informers_generated/externalversions/coredump"
+	internalinterfaces "github.com/WanLinghao/coredump-detector/pkg/client/informers_generated/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

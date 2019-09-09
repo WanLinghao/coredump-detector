@@ -28,8 +28,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/rest"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/backend"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
+	"github.com/WanLinghao/coredump-detector/pkg/backend"
+	"github.com/WanLinghao/coredump-detector/pkg/backend/types"
 )
 
 // CoredumpStreamer is a resource that streams the contents of a particular

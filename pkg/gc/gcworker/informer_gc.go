@@ -22,8 +22,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
-	coredumpclientset "github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset"
+	"github.com/WanLinghao/coredump-detector/pkg/backend/types"
+	coredumpclientset "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

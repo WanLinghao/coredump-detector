@@ -1,4 +1,4 @@
-API rule violation: names_match,github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1,CoredumpEndpointSchemeFns,DefaultSchemeFns
+API rule violation: names_match,github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1,CoredumpEndpointSchemeFns,DefaultSchemeFns
 API rule violation: names_match,k8s.io/api/authorization/v1beta1,SubjectAccessReviewSpec,Groups
 API rule violation: names_match,k8s.io/api/core/v1,AzureDiskVolumeSource,DataDiskURI
 API rule violation: names_match,k8s.io/api/core/v1,ContainerStatus,LastTerminationState

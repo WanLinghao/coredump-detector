@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	internalinterfaces "github.com/WanLinghao/fujitsu-coredump/pkg/client/informers_generated/externalversions/internalinterfaces"
+	internalinterfaces "github.com/WanLinghao/coredump-detector/pkg/client/informers_generated/externalversions/internalinterfaces"
 )
 
 // Interface provides access to all the informers in this group version.

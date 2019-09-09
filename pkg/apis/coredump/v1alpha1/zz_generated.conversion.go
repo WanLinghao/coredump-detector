@@ -23,7 +23,7 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	coredump "github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump"
+	coredump "github.com/WanLinghao/coredump-detector/pkg/apis/coredump"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"

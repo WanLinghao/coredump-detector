@@ -19,8 +19,8 @@ limitations under the License.
 package apis
 
 import (
-	"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump"
-	coredumpv1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1"
+	"github.com/WanLinghao/coredump-detector/pkg/apis/coredump"
+	coredumpv1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -42,7 +42,7 @@ func GetAllApiBuilders() []*builders.APIGroupBuilder {
 
 var coredumpApiGroup = builders.NewApiGroupBuilder(
 	"coredump.fujitsu.com",
-	"github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump").
+	"github.com/WanLinghao/coredump-detector/pkg/apis/coredump").
 	WithUnVersionedApi(coredump.ApiVersion).
 	WithVersionedApis(
 		coredumpv1alpha1.ApiVersion,

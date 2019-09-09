@@ -83,7 +83,7 @@ spec:
             cpu: 100m
             memory: 300Mi
       - name: apiserver
-        image: wlhtorresowen/fujitsu-coredump:v0.3
+        image: wlhtorresowen/:v0.3
         volumeMounts:
         - name: apiserver-certs
           mountPath: /apiserver.local.config/certificates

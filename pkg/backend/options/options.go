@@ -17,7 +17,7 @@ limitations under the License.
 package options
 
 import (
-	backendtypes "github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
+	backendtypes "github.com/WanLinghao/coredump-detector/pkg/backend/types"
 	"github.com/spf13/cobra"
 	//	"time"
 )

@@ -19,8 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset/scheme"
+	v1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
+	"github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset/scheme"
 	serializer "k8s.io/apimachinery/pkg/runtime/serializer"
 	rest "k8s.io/client-go/rest"
 )

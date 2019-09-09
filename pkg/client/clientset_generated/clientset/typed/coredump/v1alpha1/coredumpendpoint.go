@@ -19,8 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/WanLinghao/fujitsu-coredump/pkg/apis/coredump/v1alpha1"
-	scheme "github.com/WanLinghao/fujitsu-coredump/pkg/client/clientset_generated/clientset/scheme"
+	v1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
+	scheme "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

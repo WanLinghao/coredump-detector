@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/options"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/types"
-	"github.com/WanLinghao/fujitsu-coredump/pkg/backend/volume"
+	"github.com/WanLinghao/coredump-detector/pkg/backend/options"
+	"github.com/WanLinghao/coredump-detector/pkg/backend/types"
+	"github.com/WanLinghao/coredump-detector/pkg/backend/volume"
 )
 
 var backendStorage types.Storage
