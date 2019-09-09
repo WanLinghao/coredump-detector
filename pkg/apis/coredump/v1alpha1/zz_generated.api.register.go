@@ -19,6 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"log"
+
 	"github.com/WanLinghao/coredump-detector/pkg/apis/coredump"
 	"github.com/WanLinghao/coredump-detector/pkg/k8sclient"
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
@@ -27,14 +29,15 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
+	coredumpapi "github.com/WanLinghao/api/coredump"
 )
 
 var (
 	coredumpCoredumpEndpointStorage = builders.NewApiResource( // Resource status endpoint
 		coredump.InternalCoredumpEndpoint,
 		CoredumpEndpointSchemeFns{},
-		func() runtime.Object { return &CoredumpEndpoint{} },     // Register versioned resource
-		func() runtime.Object { return &CoredumpEndpointList{} }, // Register versioned resource list
+		func() runtime.Object { return &coredumpapi.CoredumpEndpoint{} },     // Register versioned resource
+		func() runtime.Object { return &coredumpapi.CoredumpEndpointList{} }, // Register versioned resource list
 		&coredump.CoredumpEndpointStrategy{builders.StorageStrategySingleton, k8sclient.GetClient().CoreV1()},
 	)
 	ApiVersion = builders.NewApiVersion("coredump.fujitsu.com", "v1alpha1").WithResources(
@@ -42,13 +45,13 @@ var (
 		builders.NewApiResource( // Resource status endpoint
 			coredump.InternalCoredumpEndpointStatus,
 			CoredumpEndpointSchemeFns{},
-			func() runtime.Object { return &CoredumpEndpoint{} },     // Register versioned resource
-			func() runtime.Object { return &CoredumpEndpointList{} }, // Register versioned resource list
+			func() runtime.Object { return &coredumpapi.CoredumpEndpoint{} },     // Register versioned resource
+			func() runtime.Object { return &coredumpapi.CoredumpEndpointList{} }, // Register versioned resource list
 			&coredump.CoredumpEndpointStatusStrategy{builders.StatusStorageStrategySingleton},
 		), builders.NewApiResourceWithStorage(
 			coredump.InternalCoredumpEndpointDumpREST,
 			builders.SchemeFnsSingleton,
-			func() runtime.Object { return &CoredumpEndpointDump{} }, // Register versioned resource
+			func() runtime.Object { return &coredumpapi.CoredumpEndpointDump{} }, // Register versioned resource
 			nil,
 			func(generic.RESTOptionsGetter) rest.Storage {
 				return &coredump.CoredumpEndpointDumpREST{coredump.NewCoredumpEndpointRegistry(coredumpCoredumpEndpointStorage)}
@@ -83,18 +86,9 @@ type CoredumpEndpointSchemeFns struct {
 	builders.DefaultSchemeFns
 }
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-
-type CoredumpEndpointList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []CoredumpEndpoint `json:"items"`
-}
-
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-
-type CoredumpEndpointDumpList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []CoredumpEndpointDump `json:"items"`
+// DefaultingFunction sets default CoredumpEndpoint field values
+func (CoredumpEndpointSchemeFns) DefaultingFunction(o interface{}) {
+	obj := o.(*coredumpapi.CoredumpEndpoint)
+	// set default field values here
+	log.Printf("Defaulting fields for CoredumpEndpoint %s\n", obj.Name)
 }

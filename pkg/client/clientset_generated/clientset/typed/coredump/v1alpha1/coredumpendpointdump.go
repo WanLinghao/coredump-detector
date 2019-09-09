@@ -19,12 +19,12 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
 	scheme "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
+	coredumpapi "github.com/WanLinghao/api/coredump"
 )
 
 // CoredumpEndpointDumpsGetter has a method to return a CoredumpEndpointDumpInterface.
@@ -35,14 +35,14 @@ type CoredumpEndpointDumpsGetter interface {
 
 // CoredumpEndpointDumpInterface has methods to work with CoredumpEndpointDump resources.
 type CoredumpEndpointDumpInterface interface {
-	Create(*v1alpha1.CoredumpEndpointDump) (*v1alpha1.CoredumpEndpointDump, error)
-	Update(*v1alpha1.CoredumpEndpointDump) (*v1alpha1.CoredumpEndpointDump, error)
+	Create(*coredumpapi.CoredumpEndpointDump) (*coredumpapi.CoredumpEndpointDump, error)
+	Update(*coredumpapi.CoredumpEndpointDump) (*coredumpapi.CoredumpEndpointDump, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1alpha1.CoredumpEndpointDump, error)
-	List(opts v1.ListOptions) (*v1alpha1.CoredumpEndpointDumpList, error)
+	Get(name string, options v1.GetOptions) (*coredumpapi.CoredumpEndpointDump, error)
+	List(opts v1.ListOptions) (*coredumpapi.CoredumpEndpointDumpList, error)
 	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.CoredumpEndpointDump, err error)
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *coredumpapi.CoredumpEndpointDump, err error)
 	CoredumpEndpointDumpExpansion
 }
 
@@ -61,8 +61,8 @@ func newCoredumpEndpointDumps(c *CoredumpV1alpha1Client, namespace string) *core
 }
 
 // Get takes name of the coredumpEndpointDump, and returns the corresponding coredumpEndpointDump object, and an error if there is any.
-func (c *coredumpEndpointDumps) Get(name string, options v1.GetOptions) (result *v1alpha1.CoredumpEndpointDump, err error) {
-	result = &v1alpha1.CoredumpEndpointDump{}
+func (c *coredumpEndpointDumps) Get(name string, options v1.GetOptions) (result *coredumpapi.CoredumpEndpointDump, err error) {
+	result = &coredumpapi.CoredumpEndpointDump{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("coredumpendpointdumps").
@@ -74,8 +74,8 @@ func (c *coredumpEndpointDumps) Get(name string, options v1.GetOptions) (result 
 }
 
 // List takes label and field selectors, and returns the list of CoredumpEndpointDumps that match those selectors.
-func (c *coredumpEndpointDumps) List(opts v1.ListOptions) (result *v1alpha1.CoredumpEndpointDumpList, err error) {
-	result = &v1alpha1.CoredumpEndpointDumpList{}
+func (c *coredumpEndpointDumps) List(opts v1.ListOptions) (result *coredumpapi.CoredumpEndpointDumpList, err error) {
+	result = &coredumpapi.CoredumpEndpointDumpList{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("coredumpendpointdumps").
@@ -96,8 +96,8 @@ func (c *coredumpEndpointDumps) Watch(opts v1.ListOptions) (watch.Interface, err
 }
 
 // Create takes the representation of a coredumpEndpointDump and creates it.  Returns the server's representation of the coredumpEndpointDump, and an error, if there is any.
-func (c *coredumpEndpointDumps) Create(coredumpEndpointDump *v1alpha1.CoredumpEndpointDump) (result *v1alpha1.CoredumpEndpointDump, err error) {
-	result = &v1alpha1.CoredumpEndpointDump{}
+func (c *coredumpEndpointDumps) Create(coredumpEndpointDump *coredumpapi.CoredumpEndpointDump) (result *coredumpapi.CoredumpEndpointDump, err error) {
+	result = &coredumpapi.CoredumpEndpointDump{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("coredumpendpointdumps").
@@ -108,8 +108,8 @@ func (c *coredumpEndpointDumps) Create(coredumpEndpointDump *v1alpha1.CoredumpEn
 }
 
 // Update takes the representation of a coredumpEndpointDump and updates it. Returns the server's representation of the coredumpEndpointDump, and an error, if there is any.
-func (c *coredumpEndpointDumps) Update(coredumpEndpointDump *v1alpha1.CoredumpEndpointDump) (result *v1alpha1.CoredumpEndpointDump, err error) {
-	result = &v1alpha1.CoredumpEndpointDump{}
+func (c *coredumpEndpointDumps) Update(coredumpEndpointDump *coredumpapi.CoredumpEndpointDump) (result *coredumpapi.CoredumpEndpointDump, err error) {
+	result = &coredumpapi.CoredumpEndpointDump{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("coredumpendpointdumps").
@@ -143,8 +143,8 @@ func (c *coredumpEndpointDumps) DeleteCollection(options *v1.DeleteOptions, list
 }
 
 // Patch applies the patch and returns the patched coredumpEndpointDump.
-func (c *coredumpEndpointDumps) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.CoredumpEndpointDump, err error) {
-	result = &v1alpha1.CoredumpEndpointDump{}
+func (c *coredumpEndpointDumps) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *coredumpapi.CoredumpEndpointDump, err error) {
+	result = &coredumpapi.CoredumpEndpointDump{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("coredumpendpointdumps").

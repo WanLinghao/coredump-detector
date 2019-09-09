@@ -19,7 +19,7 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
+	coredumpapi "github.com/WanLinghao/api/coredump"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -39,20 +39,20 @@ var coredumpendpointsResource = schema.GroupVersionResource{Group: "coredump.fuj
 var coredumpendpointsKind = schema.GroupVersionKind{Group: "coredump.fujitsu.com", Version: "v1alpha1", Kind: "CoredumpEndpoint"}
 
 // Get takes name of the coredumpEndpoint, and returns the corresponding coredumpEndpoint object, and an error if there is any.
-func (c *FakeCoredumpEndpoints) Get(name string, options v1.GetOptions) (result *v1alpha1.CoredumpEndpoint, err error) {
+func (c *FakeCoredumpEndpoints) Get(name string, options v1.GetOptions) (result *coredumpapi.CoredumpEndpoint, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(coredumpendpointsResource, c.ns, name), &v1alpha1.CoredumpEndpoint{})
+		Invokes(testing.NewGetAction(coredumpendpointsResource, c.ns, name), &coredumpapi.CoredumpEndpoint{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CoredumpEndpoint), err
+	return obj.(*coredumpapi.CoredumpEndpoint), err
 }
 
 // List takes label and field selectors, and returns the list of CoredumpEndpoints that match those selectors.
-func (c *FakeCoredumpEndpoints) List(opts v1.ListOptions) (result *v1alpha1.CoredumpEndpointList, err error) {
+func (c *FakeCoredumpEndpoints) List(opts v1.ListOptions) (result *coredumpapi.CoredumpEndpointList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(coredumpendpointsResource, coredumpendpointsKind, c.ns, opts), &v1alpha1.CoredumpEndpointList{})
+		Invokes(testing.NewListAction(coredumpendpointsResource, coredumpendpointsKind, c.ns, opts), &coredumpapi.CoredumpEndpointList{})
 
 	if obj == nil {
 		return nil, err
@@ -62,8 +62,8 @@ func (c *FakeCoredumpEndpoints) List(opts v1.ListOptions) (result *v1alpha1.Core
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1alpha1.CoredumpEndpointList{ListMeta: obj.(*v1alpha1.CoredumpEndpointList).ListMeta}
-	for _, item := range obj.(*v1alpha1.CoredumpEndpointList).Items {
+	list := &coredumpapi.CoredumpEndpointList{ListMeta: obj.(*coredumpapi.CoredumpEndpointList).ListMeta}
+	for _, item := range obj.(*coredumpapi.CoredumpEndpointList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -79,43 +79,43 @@ func (c *FakeCoredumpEndpoints) Watch(opts v1.ListOptions) (watch.Interface, err
 }
 
 // Create takes the representation of a coredumpEndpoint and creates it.  Returns the server's representation of the coredumpEndpoint, and an error, if there is any.
-func (c *FakeCoredumpEndpoints) Create(coredumpEndpoint *v1alpha1.CoredumpEndpoint) (result *v1alpha1.CoredumpEndpoint, err error) {
+func (c *FakeCoredumpEndpoints) Create(coredumpEndpoint *coredumpapi.CoredumpEndpoint) (result *coredumpapi.CoredumpEndpoint, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(coredumpendpointsResource, c.ns, coredumpEndpoint), &v1alpha1.CoredumpEndpoint{})
+		Invokes(testing.NewCreateAction(coredumpendpointsResource, c.ns, coredumpEndpoint), &coredumpapi.CoredumpEndpoint{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CoredumpEndpoint), err
+	return obj.(*coredumpapi.CoredumpEndpoint), err
 }
 
 // Update takes the representation of a coredumpEndpoint and updates it. Returns the server's representation of the coredumpEndpoint, and an error, if there is any.
-func (c *FakeCoredumpEndpoints) Update(coredumpEndpoint *v1alpha1.CoredumpEndpoint) (result *v1alpha1.CoredumpEndpoint, err error) {
+func (c *FakeCoredumpEndpoints) Update(coredumpEndpoint *coredumpapi.CoredumpEndpoint) (result *coredumpapi.CoredumpEndpoint, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(coredumpendpointsResource, c.ns, coredumpEndpoint), &v1alpha1.CoredumpEndpoint{})
+		Invokes(testing.NewUpdateAction(coredumpendpointsResource, c.ns, coredumpEndpoint), &coredumpapi.CoredumpEndpoint{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CoredumpEndpoint), err
+	return obj.(*coredumpapi.CoredumpEndpoint), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeCoredumpEndpoints) UpdateStatus(coredumpEndpoint *v1alpha1.CoredumpEndpoint) (*v1alpha1.CoredumpEndpoint, error) {
+func (c *FakeCoredumpEndpoints) UpdateStatus(coredumpEndpoint *coredumpapi.CoredumpEndpoint) (*coredumpapi.CoredumpEndpoint, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(coredumpendpointsResource, "status", c.ns, coredumpEndpoint), &v1alpha1.CoredumpEndpoint{})
+		Invokes(testing.NewUpdateSubresourceAction(coredumpendpointsResource, "status", c.ns, coredumpEndpoint), &coredumpapi.CoredumpEndpoint{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CoredumpEndpoint), err
+	return obj.(*coredumpapi.CoredumpEndpoint), err
 }
 
 // Delete takes name of the coredumpEndpoint and deletes it. Returns an error if one occurs.
 func (c *FakeCoredumpEndpoints) Delete(name string, options *v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(coredumpendpointsResource, c.ns, name), &v1alpha1.CoredumpEndpoint{})
+		Invokes(testing.NewDeleteAction(coredumpendpointsResource, c.ns, name), &coredumpapi.CoredumpEndpoint{})
 
 	return err
 }
@@ -124,17 +124,17 @@ func (c *FakeCoredumpEndpoints) Delete(name string, options *v1.DeleteOptions) e
 func (c *FakeCoredumpEndpoints) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(coredumpendpointsResource, c.ns, listOptions)
 
-	_, err := c.Fake.Invokes(action, &v1alpha1.CoredumpEndpointList{})
+	_, err := c.Fake.Invokes(action, &coredumpapi.CoredumpEndpointList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched coredumpEndpoint.
-func (c *FakeCoredumpEndpoints) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.CoredumpEndpoint, err error) {
+func (c *FakeCoredumpEndpoints) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *coredumpapi.CoredumpEndpoint, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(coredumpendpointsResource, c.ns, name, data, subresources...), &v1alpha1.CoredumpEndpoint{})
+		Invokes(testing.NewPatchSubresourceAction(coredumpendpointsResource, c.ns, name, data, subresources...), &coredumpapi.CoredumpEndpoint{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CoredumpEndpoint), err
+	return obj.(*coredumpapi.CoredumpEndpoint), err
 }

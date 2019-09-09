@@ -21,7 +21,7 @@ package v1alpha1
 import (
 	time "time"
 
-	coredumpv1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
+	coredumpapi "github.com/WanLinghao/api/coredump"
 	clientset "github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset"
 	internalinterfaces "github.com/WanLinghao/coredump-detector/pkg/client/informers_generated/externalversions/internalinterfaces"
 	v1alpha1 "github.com/WanLinghao/coredump-detector/pkg/client/listers_generated/coredump/v1alpha1"
@@ -70,7 +70,7 @@ func NewFilteredCoredumpEndpointDumpInformer(client clientset.Interface, namespa
 				return client.CoredumpV1alpha1().CoredumpEndpointDumps(namespace).Watch(options)
 			},
 		},
-		&coredumpv1alpha1.CoredumpEndpointDump{},
+		&coredumpapi.CoredumpEndpointDump{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *coredumpEndpointDumpInformer) defaultInformer(client clientset.Interfac
 }
 
 func (f *coredumpEndpointDumpInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&coredumpv1alpha1.CoredumpEndpointDump{}, f.defaultInformer)
+	return f.factory.InformerFor(&coredumpapi.CoredumpEndpointDump{}, f.defaultInformer)
 }
 
 func (f *coredumpEndpointDumpInformer) Lister() v1alpha1.CoredumpEndpointDumpLister {

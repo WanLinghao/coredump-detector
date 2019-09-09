@@ -1,6 +1,6 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
-// Copyright 2012 The Go Authors.  All rights reserved.
+// Copyright 2018 The Go Authors.  All rights reserved.
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
@@ -31,33 +31,33 @@
 
 package proto
 
-import (
-	"testing"
-)
+import "errors"
 
-// This is a separate file and package from size_test.go because that one uses
-// generated messages and thus may not be in package proto without having a circular
-// dependency, whereas this file tests unexported details of size.go.
+// Deprecated: do not use.
+type Stats struct{ Emalloc, Dmalloc, Encode, Decode, Chit, Cmiss, Size uint64 }
 
-func TestVarintSize(t *testing.T) {
-	// Check the edge cases carefully.
-	testCases := []struct {
-		n    uint64
-		size int
-	}{
-		{0, 1},
-		{1, 1},
-		{127, 1},
-		{128, 2},
-		{16383, 2},
-		{16384, 3},
-		{1<<63 - 1, 9},
-		{1 << 63, 10},
-	}
-	for _, tc := range testCases {
-		size := sizeVarint(tc.n)
-		if size != tc.size {
-			t.Errorf("sizeVarint(%d) = %d, want %d", tc.n, size, tc.size)
-		}
-	}
+// Deprecated: do not use.
+func GetStats() Stats { return Stats{} }
+
+// Deprecated: do not use.
+func MarshalMessageSet(interface{}) ([]byte, error) {
+	return nil, errors.New("proto: not implemented")
 }
+
+// Deprecated: do not use.
+func UnmarshalMessageSet([]byte, interface{}) error {
+	return errors.New("proto: not implemented")
+}
+
+// Deprecated: do not use.
+func MarshalMessageSetJSON(interface{}) ([]byte, error) {
+	return nil, errors.New("proto: not implemented")
+}
+
+// Deprecated: do not use.
+func UnmarshalMessageSetJSON([]byte, interface{}) error {
+	return errors.New("proto: not implemented")
+}
+
+// Deprecated: do not use.
+func RegisterMessageSetType(Message, int32, string) {}

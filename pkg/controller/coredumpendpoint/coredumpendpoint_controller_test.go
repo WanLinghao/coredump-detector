@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	coredumpv1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
+	coredumpapi "github.com/WanLinghao/api/coredump"
 	"github.com/onsi/gomega"
 	"golang.org/x/net/context"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

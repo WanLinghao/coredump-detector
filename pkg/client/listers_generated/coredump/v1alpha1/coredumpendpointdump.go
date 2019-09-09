@@ -23,12 +23,13 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
+	coredumpapi "github.com/WanLinghao/api/coredump"
 )
 
 // CoredumpEndpointDumpLister helps list CoredumpEndpointDumps.
 type CoredumpEndpointDumpLister interface {
 	// List lists all CoredumpEndpointDumps in the indexer.
-	List(selector labels.Selector) (ret []*v1alpha1.CoredumpEndpointDump, err error)
+	List(selector labels.Selector) (ret []*coredumpapi.CoredumpEndpointDump, err error)
 	// CoredumpEndpointDumps returns an object that can list and get CoredumpEndpointDumps.
 	CoredumpEndpointDumps(namespace string) CoredumpEndpointDumpNamespaceLister
 	CoredumpEndpointDumpListerExpansion
@@ -45,9 +46,9 @@ func NewCoredumpEndpointDumpLister(indexer cache.Indexer) CoredumpEndpointDumpLi
 }
 
 // List lists all CoredumpEndpointDumps in the indexer.
-func (s *coredumpEndpointDumpLister) List(selector labels.Selector) (ret []*v1alpha1.CoredumpEndpointDump, err error) {
+func (s *coredumpEndpointDumpLister) List(selector labels.Selector) (ret []*coredumpapi.CoredumpEndpointDump, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.CoredumpEndpointDump))
+		ret = append(ret, m.(*coredumpapi.CoredumpEndpointDump))
 	})
 	return ret, err
 }
@@ -60,9 +61,9 @@ func (s *coredumpEndpointDumpLister) CoredumpEndpointDumps(namespace string) Cor
 // CoredumpEndpointDumpNamespaceLister helps list and get CoredumpEndpointDumps.
 type CoredumpEndpointDumpNamespaceLister interface {
 	// List lists all CoredumpEndpointDumps in the indexer for a given namespace.
-	List(selector labels.Selector) (ret []*v1alpha1.CoredumpEndpointDump, err error)
+	List(selector labels.Selector) (ret []*coredumpapi.CoredumpEndpointDump, err error)
 	// Get retrieves the CoredumpEndpointDump from the indexer for a given namespace and name.
-	Get(name string) (*v1alpha1.CoredumpEndpointDump, error)
+	Get(name string) (*coredumpapi.CoredumpEndpointDump, error)
 	CoredumpEndpointDumpNamespaceListerExpansion
 }
 
@@ -74,15 +75,15 @@ type coredumpEndpointDumpNamespaceLister struct {
 }
 
 // List lists all CoredumpEndpointDumps in the indexer for a given namespace.
-func (s coredumpEndpointDumpNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.CoredumpEndpointDump, err error) {
+func (s coredumpEndpointDumpNamespaceLister) List(selector labels.Selector) (ret []*coredumpapi.CoredumpEndpointDump, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.CoredumpEndpointDump))
+		ret = append(ret, m.(*coredumpapi.CoredumpEndpointDump))
 	})
 	return ret, err
 }
 
 // Get retrieves the CoredumpEndpointDump from the indexer for a given namespace and name.
-func (s coredumpEndpointDumpNamespaceLister) Get(name string) (*v1alpha1.CoredumpEndpointDump, error) {
+func (s coredumpEndpointDumpNamespaceLister) Get(name string) (*coredumpapi.CoredumpEndpointDump, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
@@ -90,5 +91,5 @@ func (s coredumpEndpointDumpNamespaceLister) Get(name string) (*v1alpha1.Coredum
 	if !exists {
 		return nil, errors.NewNotFound(v1alpha1.Resource("coredumpendpointdump"), name)
 	}
-	return obj.(*v1alpha1.CoredumpEndpointDump), nil
+	return obj.(*coredumpapi.CoredumpEndpointDump), nil
 }

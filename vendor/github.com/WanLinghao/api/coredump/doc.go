@@ -23,4 +23,4 @@ limitations under the License.
 // +k8s:conversion-gen=github.com/WanLinghao/coredump-detector/pkg/apis/coredump
 // +k8s:defaulter-gen=TypeMeta
 // +groupName=coredump.fujitsu.com
-package v1alpha1 // import "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
+package coredump // import "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"

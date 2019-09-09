@@ -1,7 +1,7 @@
-// Go support for Protocol Buffers - Google's data interchange format
+// Protocol Buffers for Go with Gadgets
 //
-// Copyright 2014 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// Copyright (c) 2018, The GoGo Authors. All rights reserved.
+// http://github.com/gogo/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -13,9 +13,6 @@
 // copyright notice, this list of conditions and the following disclaimer
 // in the documentation and/or other materials provided with the
 // distribution.
-//     * Neither the name of Google Inc. nor the names of its
-// contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,36 +28,12 @@
 
 package proto
 
-import (
-	"bytes"
-	"testing"
-)
+import "reflect"
 
-func TestUnmarshalMessageSetWithDuplicate(t *testing.T) {
-	// Check that a repeated message set entry will be concatenated.
-	in := &messageSet{
-		Item: []*_MessageSet_Item{
-			{TypeId: Int32(12345), Message: []byte("hoo")},
-			{TypeId: Int32(12345), Message: []byte("hah")},
-		},
-	}
-	b, err := Marshal(in)
-	if err != nil {
-		t.Fatalf("Marshal: %v", err)
-	}
-	t.Logf("Marshaled bytes: %q", b)
-
-	var extensions XXX_InternalExtensions
-	if err := UnmarshalMessageSet(b, &extensions); err != nil {
-		t.Fatalf("UnmarshalMessageSet: %v", err)
-	}
-	ext, ok := extensions.p.extensionMap[12345]
-	if !ok {
-		t.Fatalf("Didn't retrieve extension 12345; map is %v", extensions.p.extensionMap)
-	}
-	// Skip wire type/field number and length varints.
-	got := skipVarint(skipVarint(ext.enc))
-	if want := []byte("hoohah"); !bytes.Equal(got, want) {
-		t.Errorf("Combined extension is %q, want %q", got, want)
-	}
+type custom interface {
+	Marshal() ([]byte, error)
+	Unmarshal(data []byte) error
+	Size() int
 }
+
+var customType = reflect.TypeOf((*custom)(nil)).Elem()
