@@ -24,7 +24,7 @@ import (
 	"github.com/WanLinghao/coredump-detector/pkg/apis/coredump"
 	"github.com/WanLinghao/coredump-detector/pkg/k8sclient"
 	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+//	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/generic"
