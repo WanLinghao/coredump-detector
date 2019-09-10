@@ -21,11 +21,21 @@ syntax = 'proto2';
 
 package k8s.io.apimachinery.pkg.apis.meta.v1beta1;
 
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/runtime/generated.proto";
 import "k8s.io/apimachinery/pkg/runtime/schema/generated.proto";
 
 // Package-wide variables from generator "generated".
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.stable_marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_getters_all) = false;
 option go_package = "v1beta1";
 
 // PartialObjectMetadata is a generic representation of any object with ObjectMeta. It allows clients
@@ -35,14 +45,14 @@ message PartialObjectMetadata {
   // Standard object's metadata.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
   // +optional
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1 [(gogoproto.customname) = "ObjectMeta", (gogoproto.nullable) = false];
 }
 
 // PartialObjectMetadataList contains a list of objects containing only their metadata
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 message PartialObjectMetadataList {
   // items contains each of the included items.
-  repeated PartialObjectMetadata items = 1;
+  repeated PartialObjectMetadata items = 1 [(gogoproto.customname) = "Items"];
 }
 
 // TableOptions are used when a Table is requested by the caller.
@@ -52,6 +62,6 @@ message TableOptions {
   // Specifying "None" will return no object, specifying "Object" will return the full object contents, and
   // specifying "Metadata" (the default) will return the object's metadata in the PartialObjectMetadata kind
   // in version v1beta1 of the meta.k8s.io API group.
-  optional string includeObject = 1;
+  optional string includeObject = 1 [(gogoproto.casttype) = "IncludeObjectPolicy", (gogoproto.customname) = "IncludeObject", (gogoproto.nullable) = false];
 }
 

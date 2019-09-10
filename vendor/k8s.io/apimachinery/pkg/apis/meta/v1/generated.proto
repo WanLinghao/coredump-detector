@@ -21,25 +21,35 @@ syntax = 'proto2';
 
 package k8s.io.apimachinery.pkg.apis.meta.v1;
 
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "k8s.io/apimachinery/pkg/runtime/generated.proto";
 import "k8s.io/apimachinery/pkg/runtime/schema/generated.proto";
 
 // Package-wide variables from generator "generated".
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.stable_marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_getters_all) = false;
 option go_package = "v1";
 
 // APIGroup contains the name, the supported versions, and the preferred version
 // of a group.
 message APIGroup {
   // name is the name of the group.
-  optional string name = 1;
+  optional string name = 1 [(gogoproto.customname) = "Name", (gogoproto.nullable) = false];
 
   // versions are the versions supported in this group.
-  repeated GroupVersionForDiscovery versions = 2;
+  repeated GroupVersionForDiscovery versions = 2 [(gogoproto.customname) = "Versions", (gogoproto.nullable) = false];
 
   // preferredVersion is the version preferred by the API server, which
   // probably is the storage version.
   // +optional
-  optional GroupVersionForDiscovery preferredVersion = 3;
+  optional GroupVersionForDiscovery preferredVersion = 3 [(gogoproto.customname) = "PreferredVersion", (gogoproto.nullable) = false];
 
   // a map of client CIDR to server address that is serving this group.
   // This is to help clients reach servers in the most network-efficient way possible.
@@ -49,49 +59,49 @@ message APIGroup {
   // For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP.
   // Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.
   // +optional
-  repeated ServerAddressByClientCIDR serverAddressByClientCIDRs = 4;
+  repeated ServerAddressByClientCIDR serverAddressByClientCIDRs = 4 [(gogoproto.customname) = "ServerAddressByClientCIDRs", (gogoproto.nullable) = false];
 }
 
 // APIGroupList is a list of APIGroup, to allow clients to discover the API at
 // /apis.
 message APIGroupList {
   // groups is a list of APIGroup.
-  repeated APIGroup groups = 1;
+  repeated APIGroup groups = 1 [(gogoproto.customname) = "Groups", (gogoproto.nullable) = false];
 }
 
 // APIResource specifies the name of a resource and whether it is namespaced.
 message APIResource {
   // name is the plural name of the resource.
-  optional string name = 1;
+  optional string name = 1 [(gogoproto.customname) = "Name", (gogoproto.nullable) = false];
 
   // singularName is the singular name of the resource.  This allows clients to handle plural and singular opaquely.
   // The singularName is more correct for reporting status on a single item and both singular and plural are allowed
   // from the kubectl CLI interface.
-  optional string singularName = 6;
+  optional string singularName = 6 [(gogoproto.customname) = "SingularName", (gogoproto.nullable) = false];
 
   // namespaced indicates if a resource is namespaced or not.
-  optional bool namespaced = 2;
+  optional bool namespaced = 2 [(gogoproto.customname) = "Namespaced", (gogoproto.nullable) = false];
 
   // group is the preferred group of the resource.  Empty implies the group of the containing resource list.
   // For subresources, this may have a different value, for example: Scale".
-  optional string group = 8;
+  optional string group = 8 [(gogoproto.customname) = "Group", (gogoproto.nullable) = false];
 
   // version is the preferred version of the resource.  Empty implies the version of the containing resource list
   // For subresources, this may have a different value, for example: v1 (while inside a v1beta1 version of the core resource's group)".
-  optional string version = 9;
+  optional string version = 9 [(gogoproto.customname) = "Version", (gogoproto.nullable) = false];
 
   // kind is the kind for the resource (e.g. 'Foo' is the kind for a resource 'foo')
-  optional string kind = 3;
+  optional string kind = 3 [(gogoproto.customname) = "Kind", (gogoproto.nullable) = false];
 
   // verbs is a list of supported kube verbs (this includes get, list, watch, create,
   // update, patch, delete, deletecollection, and proxy)
-  optional Verbs verbs = 4;
+  optional Verbs verbs = 4 [(gogoproto.customname) = "Verbs"];
 
   // shortNames is a list of suggested short names of the resource.
-  repeated string shortNames = 5;
+  repeated string shortNames = 5 [(gogoproto.customname) = "ShortNames"];
 
   // categories is a list of the grouped resources this resource belongs to (e.g. 'all')
-  repeated string categories = 7;
+  repeated string categories = 7 [(gogoproto.customname) = "Categories"];
 }
 
 // APIResourceList is a list of APIResource, it is used to expose the name of the
@@ -99,10 +109,10 @@ message APIResource {
 // is namespaced.
 message APIResourceList {
   // groupVersion is the group and version this APIResourceList is for.
-  optional string groupVersion = 1;
+  optional string groupVersion = 1 [(gogoproto.customname) = "GroupVersion", (gogoproto.nullable) = false];
 
   // resources contains the name of the resources and if they are namespaced.
-  repeated APIResource resources = 2;
+  repeated APIResource resources = 2 [(gogoproto.customname) = "APIResources", (gogoproto.nullable) = false];
 }
 
 // APIVersions lists the versions that are available, to allow clients to
@@ -111,8 +121,11 @@ message APIResourceList {
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 message APIVersions {
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
+
   // versions are the api versions that are available.
-  repeated string versions = 1;
+  repeated string versions = 1 [(gogoproto.customname) = "Versions"];
 
   // a map of client CIDR to server address that is serving this group.
   // This is to help clients reach servers in the most network-efficient way possible.
@@ -121,7 +134,7 @@ message APIVersions {
   // The server returns only those CIDRs that it thinks that the client can match.
   // For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP.
   // Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.
-  repeated ServerAddressByClientCIDR serverAddressByClientCIDRs = 2;
+  repeated ServerAddressByClientCIDR serverAddressByClientCIDRs = 2 [(gogoproto.customname) = "ServerAddressByClientCIDRs", (gogoproto.nullable) = false];
 }
 
 // CreateOptions may be provided when creating an API object.
@@ -132,11 +145,11 @@ message CreateOptions {
   // request. Valid values are:
   // - All: all dry run stages will be processed
   // +optional
-  repeated string dryRun = 1;
+  repeated string dryRun = 1 [(gogoproto.customname) = "DryRun"];
 
   // If IncludeUninitialized is specified, the object may be
   // returned without completing initialization.
-  optional bool includeUninitialized = 2;
+  optional bool includeUninitialized = 2 [(gogoproto.customname) = "IncludeUninitialized", (gogoproto.nullable) = false];
 }
 
 // DeleteOptions may be provided when deleting an API object.
@@ -146,19 +159,19 @@ message DeleteOptions {
   // specified type will be used.
   // Defaults to a per object value if not specified. zero means delete immediately.
   // +optional
-  optional int64 gracePeriodSeconds = 1;
+  optional int64 gracePeriodSeconds = 1 [(gogoproto.customname) = "GracePeriodSeconds"];
 
   // Must be fulfilled before a deletion is carried out. If not possible, a 409 Conflict status will be
   // returned.
   // +optional
-  optional Preconditions preconditions = 2;
+  optional Preconditions preconditions = 2 [(gogoproto.customname) = "Preconditions"];
 
   // Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7.
   // Should the dependent objects be orphaned. If true/false, the "orphan"
   // finalizer will be added to/removed from the object's finalizers list.
   // Either this field or PropagationPolicy may be set, but not both.
   // +optional
-  optional bool orphanDependents = 3;
+  optional bool orphanDependents = 3 [(gogoproto.customname) = "OrphanDependents"];
 
   // Whether and how garbage collection will be performed.
   // Either this field or OrphanDependents may be set, but not both.
@@ -169,7 +182,7 @@ message DeleteOptions {
   // 'Foreground' - a cascading policy that deletes all dependents in the
   // foreground.
   // +optional
-  optional string propagationPolicy = 4;
+  optional string propagationPolicy = 4 [(gogoproto.casttype) = "DeletionPropagation", (gogoproto.customname) = "PropagationPolicy"];
 
   // When present, indicates that modifications should not be
   // persisted. An invalid or unrecognized dryRun directive will
@@ -177,23 +190,23 @@ message DeleteOptions {
   // request. Valid values are:
   // - All: all dry run stages will be processed
   // +optional
-  repeated string dryRun = 5;
+  repeated string dryRun = 5 [(gogoproto.customname) = "DryRun"];
 }
 
 // Duration is a wrapper around time.Duration which supports correct
 // marshaling to YAML and JSON. In particular, it marshals into strings, which
 // can be used as map keys in json.
 message Duration {
-  optional int64 duration = 1;
+  optional int64 duration = 1 [(gogoproto.casttype) = "time.Duration", (gogoproto.customname) = "Duration", (gogoproto.nullable) = false];
 }
 
 // ExportOptions is the query options to the standard REST get call.
 message ExportOptions {
   // Should this value be exported.  Export strips fields that a user can not specify.
-  optional bool export = 1;
+  optional bool export = 1 [(gogoproto.customname) = "Export", (gogoproto.nullable) = false];
 
   // Should the export be exact.  Exact export maintains cluster-specific fields like 'Namespace'.
-  optional bool exact = 2;
+  optional bool exact = 2 [(gogoproto.customname) = "Exact", (gogoproto.nullable) = false];
 }
 
 // GetOptions is the standard query options to the standard REST get call.
@@ -202,11 +215,11 @@ message GetOptions {
   // - if unset, then the result is returned from remote storage based on quorum-read flag;
   // - if it's 0, then we simply return what we currently have in cache, no guarantee;
   // - if set to non zero, then the result is at least as fresh as given rv.
-  optional string resourceVersion = 1;
+  optional string resourceVersion = 1 [(gogoproto.customname) = "ResourceVersion", (gogoproto.nullable) = false];
 
   // If true, partially initialized resources are included in the response.
   // +optional
-  optional bool includeUninitialized = 2;
+  optional bool includeUninitialized = 2 [(gogoproto.customname) = "IncludeUninitialized", (gogoproto.nullable) = false];
 }
 
 // GroupKind specifies a Group and a Kind, but does not force a version.  This is useful for identifying
@@ -214,9 +227,12 @@ message GetOptions {
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message GroupKind {
-  optional string group = 1;
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
 
-  optional string kind = 2;
+  optional string group = 1 [(gogoproto.customname) = "Group", (gogoproto.nullable) = false];
+
+  optional string kind = 2 [(gogoproto.customname) = "Kind", (gogoproto.nullable) = false];
 }
 
 // GroupResource specifies a Group and a Resource, but does not force a version.  This is useful for identifying
@@ -224,29 +240,35 @@ message GroupKind {
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message GroupResource {
-  optional string group = 1;
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
 
-  optional string resource = 2;
+  optional string group = 1 [(gogoproto.customname) = "Group", (gogoproto.nullable) = false];
+
+  optional string resource = 2 [(gogoproto.customname) = "Resource", (gogoproto.nullable) = false];
 }
 
 // GroupVersion contains the "group" and the "version", which uniquely identifies the API.
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message GroupVersion {
-  optional string group = 1;
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
 
-  optional string version = 2;
+  optional string group = 1 [(gogoproto.customname) = "Group", (gogoproto.nullable) = false];
+
+  optional string version = 2 [(gogoproto.customname) = "Version", (gogoproto.nullable) = false];
 }
 
 // GroupVersion contains the "group/version" and "version" string of a version.
 // It is made a struct to keep extensibility.
 message GroupVersionForDiscovery {
   // groupVersion specifies the API group and version in the form "group/version"
-  optional string groupVersion = 1;
+  optional string groupVersion = 1 [(gogoproto.customname) = "GroupVersion", (gogoproto.nullable) = false];
 
   // version specifies the version in the form of "version". This is to save
   // the clients the trouble of splitting the GroupVersion.
-  optional string version = 2;
+  optional string version = 2 [(gogoproto.customname) = "Version", (gogoproto.nullable) = false];
 }
 
 // GroupVersionKind unambiguously identifies a kind.  It doesn't anonymously include GroupVersion
@@ -254,11 +276,14 @@ message GroupVersionForDiscovery {
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message GroupVersionKind {
-  optional string group = 1;
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
 
-  optional string version = 2;
+  optional string group = 1 [(gogoproto.customname) = "Group", (gogoproto.nullable) = false];
 
-  optional string kind = 3;
+  optional string version = 2 [(gogoproto.customname) = "Version", (gogoproto.nullable) = false];
+
+  optional string kind = 3 [(gogoproto.customname) = "Kind", (gogoproto.nullable) = false];
 }
 
 // GroupVersionResource unambiguously identifies a resource.  It doesn't anonymously include GroupVersion
@@ -266,17 +291,20 @@ message GroupVersionKind {
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message GroupVersionResource {
-  optional string group = 1;
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
 
-  optional string version = 2;
+  optional string group = 1 [(gogoproto.customname) = "Group", (gogoproto.nullable) = false];
 
-  optional string resource = 3;
+  optional string version = 2 [(gogoproto.customname) = "Version", (gogoproto.nullable) = false];
+
+  optional string resource = 3 [(gogoproto.customname) = "Resource", (gogoproto.nullable) = false];
 }
 
 // Initializer is information about an initializer that has not yet completed.
 message Initializer {
   // name of the process that is responsible for initializing this object.
-  optional string name = 1;
+  optional string name = 1 [(gogoproto.customname) = "Name", (gogoproto.nullable) = false];
 }
 
 // Initializers tracks the progress of initialization.
@@ -287,11 +315,11 @@ message Initializers {
   // clients.
   // +patchMergeKey=name
   // +patchStrategy=merge
-  repeated Initializer pending = 1;
+  repeated Initializer pending = 1 [(gogoproto.customname) = "Pending", (gogoproto.nullable) = false];
 
   // If result is set with the Failure field, the object will be persisted to storage and then deleted,
   // ensuring that other clients can observe the deletion.
-  optional Status result = 2;
+  optional Status result = 2 [(gogoproto.customname) = "Result"];
 }
 
 // A label selector is a label query over a set of resources. The result of matchLabels and
@@ -302,11 +330,11 @@ message LabelSelector {
   // map is equivalent to an element of matchExpressions, whose key field is "key", the
   // operator is "In", and the values array contains only "value". The requirements are ANDed.
   // +optional
-  map<string, string> matchLabels = 1;
+  map<string, string> matchLabels = 1 [(gogoproto.customname) = "MatchLabels", (gogoproto.nullable) = false];
 
   // matchExpressions is a list of label selector requirements. The requirements are ANDed.
   // +optional
-  repeated LabelSelectorRequirement matchExpressions = 2;
+  repeated LabelSelectorRequirement matchExpressions = 2 [(gogoproto.customname) = "MatchExpressions", (gogoproto.nullable) = false];
 }
 
 // A label selector requirement is a selector that contains values, a key, and an operator that
@@ -315,18 +343,18 @@ message LabelSelectorRequirement {
   // key is the label key that the selector applies to.
   // +patchMergeKey=key
   // +patchStrategy=merge
-  optional string key = 1;
+  optional string key = 1 [(gogoproto.customname) = "Key", (gogoproto.nullable) = false];
 
   // operator represents a key's relationship to a set of values.
   // Valid operators are In, NotIn, Exists and DoesNotExist.
-  optional string operator = 2;
+  optional string operator = 2 [(gogoproto.casttype) = "LabelSelectorOperator", (gogoproto.customname) = "Operator", (gogoproto.nullable) = false];
 
   // values is an array of string values. If the operator is In or NotIn,
   // the values array must be non-empty. If the operator is Exists or DoesNotExist,
   // the values array must be empty. This array is replaced during a strategic
   // merge patch.
   // +optional
-  repeated string values = 3;
+  repeated string values = 3 [(gogoproto.customname) = "Values"];
 }
 
 // List holds a list of objects, which may not be known by the server.
@@ -334,10 +362,10 @@ message List {
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
   // +optional
-  optional ListMeta metadata = 1;
+  optional ListMeta metadata = 1 [(gogoproto.customname) = "ListMeta", (gogoproto.nullable) = false];
 
   // List of objects
-  repeated k8s.io.apimachinery.pkg.runtime.RawExtension items = 2;
+  repeated k8s.io.apimachinery.pkg.runtime.RawExtension items = 2 [(gogoproto.customname) = "Items", (gogoproto.nullable) = false];
 }
 
 // ListMeta describes metadata that synthetic resources must have, including lists and
@@ -347,7 +375,7 @@ message ListMeta {
   // Populated by the system.
   // Read-only.
   // +optional
-  optional string selfLink = 1;
+  optional string selfLink = 1 [(gogoproto.customname) = "SelfLink", (gogoproto.nullable) = false];
 
   // String that identifies the server's internal version of this object that
   // can be used by clients to determine when objects have changed.
@@ -356,7 +384,7 @@ message ListMeta {
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency
   // +optional
-  optional string resourceVersion = 2;
+  optional string resourceVersion = 2 [(gogoproto.customname) = "ResourceVersion", (gogoproto.nullable) = false];
 
   // continue may be set if the user set a limit on the number of items returned, and indicates that
   // the server has more data available. The value is opaque and may be used to issue another request
@@ -365,7 +393,7 @@ message ListMeta {
   // minutes have passed. The resourceVersion field returned when using this continue value will be
   // identical to the value in the first response, unless you have received this token from an error
   // message.
-  optional string continue = 3;
+  optional string continue = 3 [(gogoproto.customname) = "Continue", (gogoproto.nullable) = false];
 }
 
 // ListOptions is the query options to a standard REST list call.
@@ -373,21 +401,21 @@ message ListOptions {
   // A selector to restrict the list of returned objects by their labels.
   // Defaults to everything.
   // +optional
-  optional string labelSelector = 1;
+  optional string labelSelector = 1 [(gogoproto.customname) = "LabelSelector", (gogoproto.nullable) = false];
 
   // A selector to restrict the list of returned objects by their fields.
   // Defaults to everything.
   // +optional
-  optional string fieldSelector = 2;
+  optional string fieldSelector = 2 [(gogoproto.customname) = "FieldSelector", (gogoproto.nullable) = false];
 
   // If true, partially initialized resources are included in the response.
   // +optional
-  optional bool includeUninitialized = 6;
+  optional bool includeUninitialized = 6 [(gogoproto.customname) = "IncludeUninitialized", (gogoproto.nullable) = false];
 
   // Watch for changes to the described resources and return them as a stream of
   // add, update, and remove notifications. Specify resourceVersion.
   // +optional
-  optional bool watch = 3;
+  optional bool watch = 3 [(gogoproto.customname) = "Watch", (gogoproto.nullable) = false];
 
   // When specified with a watch call, shows changes that occur after that particular version of a resource.
   // Defaults to changes from the beginning of history.
@@ -396,12 +424,12 @@ message ListOptions {
   // - if it's 0, then we simply return what we currently have in cache, no guarantee;
   // - if set to non zero, then the result is at least as fresh as given rv.
   // +optional
-  optional string resourceVersion = 4;
+  optional string resourceVersion = 4 [(gogoproto.customname) = "ResourceVersion", (gogoproto.nullable) = false];
 
   // Timeout for the list/watch call.
   // This limits the duration of the call, regardless of any activity or inactivity.
   // +optional
-  optional int64 timeoutSeconds = 5;
+  optional int64 timeoutSeconds = 5 [(gogoproto.customname) = "TimeoutSeconds"];
 
   // limit is a maximum number of responses to return for a list call. If more items exist, the
   // server will set the `continue` field on the list metadata to a value that can be used with the
@@ -419,7 +447,7 @@ message ListOptions {
   // smaller chunks of a very large result can ensure they see all possible objects. If objects are
   // updated during a chunked list the version of the object that was present at the time the first list
   // result was calculated is returned.
-  optional int64 limit = 7;
+  optional int64 limit = 7 [(gogoproto.customname) = "Limit", (gogoproto.nullable) = false];
 
   // The continue option should be set when retrieving more results from the server. Since this value is
   // server defined, clients may only use the continue value from a previous query result with identical
@@ -435,7 +463,7 @@ message ListOptions {
   //
   // This field is not supported when watch is true. Clients may start a watch from the last
   // resourceVersion value returned by the server and not miss any modifications.
-  optional string continue = 8;
+  optional string continue = 8 [(gogoproto.customname) = "Continue", (gogoproto.nullable) = false];
 }
 
 // MicroTime is version of Time with microsecond level precision.
@@ -444,16 +472,22 @@ message ListOptions {
 // +protobuf.as=Timestamp
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message MicroTime {
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.marshaler) = false;
+  option (gogoproto.sizer) = false;
+  option (gogoproto.stringer) = false;
+  option (gogoproto.unmarshaler) = false;
+
   // Represents seconds of UTC time since Unix epoch
   // 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
   // 9999-12-31T23:59:59Z inclusive.
-  optional int64 seconds = 1;
+  optional int64 seconds = 1 [(gogoproto.customname) = "Seconds", (gogoproto.nullable) = false];
 
   // Non-negative fractions of a second at nanosecond resolution. Negative
   // second values with fractions must still have non-negative nanos values
   // that count forward in time. Must be from 0 to 999,999,999
   // inclusive. This field may be limited in precision depending on context.
-  optional int32 nanos = 2;
+  optional int32 nanos = 2 [(gogoproto.customname) = "Nanos", (gogoproto.nullable) = false];
 }
 
 // ObjectMeta is metadata that all persisted resources must have, which includes all objects
@@ -466,7 +500,7 @@ message ObjectMeta {
   // Cannot be updated.
   // More info: http://kubernetes.io/docs/user-guide/identifiers#names
   // +optional
-  optional string name = 1;
+  optional string name = 1 [(gogoproto.customname) = "Name", (gogoproto.nullable) = false];
 
   // GenerateName is an optional prefix, used by the server, to generate a unique
   // name ONLY IF the Name field has not been provided.
@@ -484,7 +518,7 @@ message ObjectMeta {
   // Applied only if Name is not specified.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#idempotency
   // +optional
-  optional string generateName = 2;
+  optional string generateName = 2 [(gogoproto.customname) = "GenerateName", (gogoproto.nullable) = false];
 
   // Namespace defines the space within each name must be unique. An empty namespace is
   // equivalent to the "default" namespace, but "default" is the canonical representation.
@@ -495,13 +529,13 @@ message ObjectMeta {
   // Cannot be updated.
   // More info: http://kubernetes.io/docs/user-guide/namespaces
   // +optional
-  optional string namespace = 3;
+  optional string namespace = 3 [(gogoproto.customname) = "Namespace", (gogoproto.nullable) = false];
 
   // SelfLink is a URL representing this object.
   // Populated by the system.
   // Read-only.
   // +optional
-  optional string selfLink = 4;
+  optional string selfLink = 4 [(gogoproto.customname) = "SelfLink", (gogoproto.nullable) = false];
 
   // UID is the unique in time and space value for this object. It is typically generated by
   // the server on successful creation of a resource and is not allowed to change on PUT
@@ -511,7 +545,7 @@ message ObjectMeta {
   // Read-only.
   // More info: http://kubernetes.io/docs/user-guide/identifiers#uids
   // +optional
-  optional string uid = 5;
+  optional string uid = 5 [(gogoproto.casttype) = "k8s.io/apimachinery/pkg/types.UID", (gogoproto.customname) = "UID", (gogoproto.nullable) = false];
 
   // An opaque value that represents the internal version of this object that can
   // be used by clients to determine when objects have changed. May be used for optimistic
@@ -524,12 +558,12 @@ message ObjectMeta {
   // Value must be treated as opaque by clients and .
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency
   // +optional
-  optional string resourceVersion = 6;
+  optional string resourceVersion = 6 [(gogoproto.customname) = "ResourceVersion", (gogoproto.nullable) = false];
 
   // A sequence number representing a specific generation of the desired state.
   // Populated by the system. Read-only.
   // +optional
-  optional int64 generation = 7;
+  optional int64 generation = 7 [(gogoproto.customname) = "Generation", (gogoproto.nullable) = false];
 
   // CreationTimestamp is a timestamp representing the server time when this object was
   // created. It is not guaranteed to be set in happens-before order across separate operations.
@@ -540,7 +574,7 @@ message ObjectMeta {
   // Null for lists.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
   // +optional
-  optional Time creationTimestamp = 8;
+  optional Time creationTimestamp = 8 [(gogoproto.customname) = "CreationTimestamp", (gogoproto.nullable) = false];
 
   // DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This
   // field is set by the server when a graceful deletion is requested by the user, and is not
@@ -561,28 +595,28 @@ message ObjectMeta {
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
   // +optional
-  optional Time deletionTimestamp = 9;
+  optional Time deletionTimestamp = 9 [(gogoproto.customname) = "DeletionTimestamp"];
 
   // Number of seconds allowed for this object to gracefully terminate before
   // it will be removed from the system. Only set when deletionTimestamp is also set.
   // May only be shortened.
   // Read-only.
   // +optional
-  optional int64 deletionGracePeriodSeconds = 10;
+  optional int64 deletionGracePeriodSeconds = 10 [(gogoproto.customname) = "DeletionGracePeriodSeconds"];
 
   // Map of string keys and values that can be used to organize and categorize
   // (scope and select) objects. May match selectors of replication controllers
   // and services.
   // More info: http://kubernetes.io/docs/user-guide/labels
   // +optional
-  map<string, string> labels = 11;
+  map<string, string> labels = 11 [(gogoproto.customname) = "Labels", (gogoproto.nullable) = false];
 
   // Annotations is an unstructured key value map stored with a resource that may be
   // set by external tools to store and retrieve arbitrary metadata. They are not
   // queryable and should be preserved when modifying objects.
   // More info: http://kubernetes.io/docs/user-guide/annotations
   // +optional
-  map<string, string> annotations = 12;
+  map<string, string> annotations = 12 [(gogoproto.customname) = "Annotations", (gogoproto.nullable) = false];
 
   // List of objects depended by this object. If ALL objects in the list have
   // been deleted, this object will be garbage collected. If this object is managed by a controller,
@@ -591,7 +625,7 @@ message ObjectMeta {
   // +optional
   // +patchMergeKey=uid
   // +patchStrategy=merge
-  repeated OwnerReference ownerReferences = 13;
+  repeated OwnerReference ownerReferences = 13 [(gogoproto.customname) = "OwnerReferences", (gogoproto.nullable) = false];
 
   // An initializer is a controller which enforces some system invariant at object creation time.
   // This field is a list of initializers that have not yet acted on this object. If nil or empty,
@@ -602,7 +636,7 @@ message ObjectMeta {
   // When an object is created, the system will populate this list with the current set of initializers.
   // Only privileged users may set or modify this list. Once it is empty, it may not be modified further
   // by any user.
-  optional Initializers initializers = 16;
+  optional Initializers initializers = 16 [(gogoproto.customname) = "Initializers"];
 
   // Must be empty before the object is deleted from the registry. Each entry
   // is an identifier for the responsible component that will remove the entry
@@ -610,13 +644,13 @@ message ObjectMeta {
   // in this list can only be removed.
   // +optional
   // +patchStrategy=merge
-  repeated string finalizers = 14;
+  repeated string finalizers = 14 [(gogoproto.customname) = "Finalizers"];
 
   // The name of the cluster which the object belongs to.
   // This is used to distinguish resources with same name and namespace in different clusters.
   // This field is not set anywhere right now and apiserver is going to ignore it if set in create or update request.
   // +optional
-  optional string clusterName = 15;
+  optional string clusterName = 15 [(gogoproto.customname) = "ClusterName", (gogoproto.nullable) = false];
 }
 
 // OwnerReference contains enough information to let you identify an owning
@@ -624,23 +658,23 @@ message ObjectMeta {
 // is no namespace field.
 message OwnerReference {
   // API version of the referent.
-  optional string apiVersion = 5;
+  optional string apiVersion = 5 [(gogoproto.customname) = "APIVersion", (gogoproto.nullable) = false];
 
   // Kind of the referent.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
-  optional string kind = 1;
+  optional string kind = 1 [(gogoproto.customname) = "Kind", (gogoproto.nullable) = false];
 
   // Name of the referent.
   // More info: http://kubernetes.io/docs/user-guide/identifiers#names
-  optional string name = 3;
+  optional string name = 3 [(gogoproto.customname) = "Name", (gogoproto.nullable) = false];
 
   // UID of the referent.
   // More info: http://kubernetes.io/docs/user-guide/identifiers#uids
-  optional string uid = 4;
+  optional string uid = 4 [(gogoproto.casttype) = "k8s.io/apimachinery/pkg/types.UID", (gogoproto.customname) = "UID", (gogoproto.nullable) = false];
 
   // If true, this reference points to the managing controller.
   // +optional
-  optional bool controller = 6;
+  optional bool controller = 6 [(gogoproto.customname) = "Controller"];
 
   // If true, AND if the owner has the "foregroundDeletion" finalizer, then
   // the owner cannot be deleted from the key-value store until this
@@ -649,7 +683,7 @@ message OwnerReference {
   // To set this field, a user needs "delete" permission of the owner,
   // otherwise 422 (Unprocessable Entity) will be returned.
   // +optional
-  optional bool blockOwnerDeletion = 7;
+  optional bool blockOwnerDeletion = 7 [(gogoproto.customname) = "BlockOwnerDeletion"];
 }
 
 // Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.
@@ -660,24 +694,24 @@ message Patch {
 message Preconditions {
   // Specifies the target UID.
   // +optional
-  optional string uid = 1;
+  optional string uid = 1 [(gogoproto.casttype) = "k8s.io/apimachinery/pkg/types.UID", (gogoproto.customname) = "UID"];
 }
 
 // RootPaths lists the paths available at root.
 // For example: "/healthz", "/apis".
 message RootPaths {
   // paths are the paths available at root.
-  repeated string paths = 1;
+  repeated string paths = 1 [(gogoproto.customname) = "Paths"];
 }
 
 // ServerAddressByClientCIDR helps the client to determine the server address that they should use, depending on the clientCIDR that they match.
 message ServerAddressByClientCIDR {
   // The CIDR with which clients can match their IP to figure out the server address that they should use.
-  optional string clientCIDR = 1;
+  optional string clientCIDR = 1 [(gogoproto.customname) = "ClientCIDR", (gogoproto.nullable) = false];
 
   // Address of this server, suitable for a client that matches the above CIDR.
   // This can be a hostname, hostname:port, IP or IP:port.
-  optional string serverAddress = 2;
+  optional string serverAddress = 2 [(gogoproto.customname) = "ServerAddress", (gogoproto.nullable) = false];
 }
 
 // Status is a return value for calls that don't return other objects.
@@ -685,35 +719,35 @@ message Status {
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
   // +optional
-  optional ListMeta metadata = 1;
+  optional ListMeta metadata = 1 [(gogoproto.customname) = "ListMeta", (gogoproto.nullable) = false];
 
   // Status of the operation.
   // One of: "Success" or "Failure".
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
   // +optional
-  optional string status = 2;
+  optional string status = 2 [(gogoproto.customname) = "Status", (gogoproto.nullable) = false];
 
   // A human-readable description of the status of this operation.
   // +optional
-  optional string message = 3;
+  optional string message = 3 [(gogoproto.customname) = "Message", (gogoproto.nullable) = false];
 
   // A machine-readable description of why this operation is in the
   // "Failure" status. If this value is empty there
   // is no information available. A Reason clarifies an HTTP status
   // code but does not override it.
   // +optional
-  optional string reason = 4;
+  optional string reason = 4 [(gogoproto.casttype) = "StatusReason", (gogoproto.customname) = "Reason", (gogoproto.nullable) = false];
 
   // Extended data associated with the reason.  Each reason may define its
   // own extended details. This field is optional and the data returned
   // is not guaranteed to conform to any schema except that defined by
   // the reason type.
   // +optional
-  optional StatusDetails details = 5;
+  optional StatusDetails details = 5 [(gogoproto.customname) = "Details"];
 
   // Suggested HTTP return code for this status, 0 if not set.
   // +optional
-  optional int32 code = 6;
+  optional int32 code = 6 [(gogoproto.customname) = "Code", (gogoproto.nullable) = false];
 }
 
 // StatusCause provides more information about an api.Status failure, including
@@ -722,12 +756,12 @@ message StatusCause {
   // A machine-readable description of the cause of the error. If this value is
   // empty there is no information available.
   // +optional
-  optional string reason = 1;
+  optional string reason = 1 [(gogoproto.casttype) = "CauseType", (gogoproto.customname) = "Type", (gogoproto.nullable) = false];
 
   // A human-readable description of the cause of the error.  This field may be
   // presented as-is to a reader.
   // +optional
-  optional string message = 2;
+  optional string message = 2 [(gogoproto.customname) = "Message", (gogoproto.nullable) = false];
 
   // The field of the resource that has caused this error, as named by its JSON
   // serialization. May include dot and postfix notation for nested attributes.
@@ -739,7 +773,7 @@ message StatusCause {
   //   "name" - the field "name" on the current resource
   //   "items[0].name" - the field "name" on the first array entry in "items"
   // +optional
-  optional string field = 3;
+  optional string field = 3 [(gogoproto.customname) = "Field", (gogoproto.nullable) = false];
 }
 
 // StatusDetails is a set of additional properties that MAY be set by the
@@ -752,34 +786,34 @@ message StatusDetails {
   // The name attribute of the resource associated with the status StatusReason
   // (when there is a single name which can be described).
   // +optional
-  optional string name = 1;
+  optional string name = 1 [(gogoproto.customname) = "Name", (gogoproto.nullable) = false];
 
   // The group attribute of the resource associated with the status StatusReason.
   // +optional
-  optional string group = 2;
+  optional string group = 2 [(gogoproto.customname) = "Group", (gogoproto.nullable) = false];
 
   // The kind attribute of the resource associated with the status StatusReason.
   // On some operations may differ from the requested resource Kind.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
   // +optional
-  optional string kind = 3;
+  optional string kind = 3 [(gogoproto.customname) = "Kind", (gogoproto.nullable) = false];
 
   // UID of the resource.
   // (when there is a single resource which can be described).
   // More info: http://kubernetes.io/docs/user-guide/identifiers#uids
   // +optional
-  optional string uid = 6;
+  optional string uid = 6 [(gogoproto.casttype) = "k8s.io/apimachinery/pkg/types.UID", (gogoproto.customname) = "UID", (gogoproto.nullable) = false];
 
   // The Causes array includes more details associated with the StatusReason
   // failure. Not all StatusReasons may provide detailed causes.
   // +optional
-  repeated StatusCause causes = 4;
+  repeated StatusCause causes = 4 [(gogoproto.customname) = "Causes", (gogoproto.nullable) = false];
 
   // If specified, the time in seconds before the operation should be retried. Some errors may indicate
   // the client must take an alternate action - for those errors this field may indicate how long to wait
   // before taking the alternate action.
   // +optional
-  optional int32 retryAfterSeconds = 5;
+  optional int32 retryAfterSeconds = 5 [(gogoproto.customname) = "RetryAfterSeconds", (gogoproto.nullable) = false];
 }
 
 // Time is a wrapper around time.Time which supports correct
@@ -790,16 +824,22 @@ message StatusDetails {
 // +protobuf.as=Timestamp
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message Time {
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.marshaler) = false;
+  option (gogoproto.sizer) = false;
+  option (gogoproto.stringer) = false;
+  option (gogoproto.unmarshaler) = false;
+
   // Represents seconds of UTC time since Unix epoch
   // 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
   // 9999-12-31T23:59:59Z inclusive.
-  optional int64 seconds = 1;
+  optional int64 seconds = 1 [(gogoproto.customname) = "Seconds", (gogoproto.nullable) = false];
 
   // Non-negative fractions of a second at nanosecond resolution. Negative
   // second values with fractions must still have non-negative nanos values
   // that count forward in time. Must be from 0 to 999,999,999
   // inclusive. This field may be limited in precision depending on context.
-  optional int32 nanos = 2;
+  optional int32 nanos = 2 [(gogoproto.customname) = "Nanos", (gogoproto.nullable) = false];
 }
 
 // Timestamp is a struct that is equivalent to Time, but intended for
@@ -809,13 +849,13 @@ message Timestamp {
   // Represents seconds of UTC time since Unix epoch
   // 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
   // 9999-12-31T23:59:59Z inclusive.
-  optional int64 seconds = 1;
+  optional int64 seconds = 1 [(gogoproto.customname) = "Seconds", (gogoproto.nullable) = false];
 
   // Non-negative fractions of a second at nanosecond resolution. Negative
   // second values with fractions must still have non-negative nanos values
   // that count forward in time. Must be from 0 to 999,999,999
   // inclusive. This field may be limited in precision depending on context.
-  optional int32 nanos = 2;
+  optional int32 nanos = 2 [(gogoproto.customname) = "Nanos", (gogoproto.nullable) = false];
 }
 
 // TypeMeta describes an individual object in an API response or request
@@ -830,14 +870,14 @@ message TypeMeta {
   // In CamelCase.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
   // +optional
-  optional string kind = 1;
+  optional string kind = 1 [(gogoproto.customname) = "Kind", (gogoproto.nullable) = false];
 
   // APIVersion defines the versioned schema of this representation of an object.
   // Servers should convert recognized schemas to the latest internal value, and
   // may reject unrecognized values.
   // More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources
   // +optional
-  optional string apiVersion = 2;
+  optional string apiVersion = 2 [(gogoproto.customname) = "APIVersion", (gogoproto.nullable) = false];
 }
 
 // UpdateOptions may be provided when updating an API object.
@@ -848,7 +888,7 @@ message UpdateOptions {
   // request. Valid values are:
   // - All: all dry run stages will be processed
   // +optional
-  repeated string dryRun = 1;
+  repeated string dryRun = 1 [(gogoproto.customname) = "DryRun"];
 }
 
 // Verbs masks the value so protobuf can generate
@@ -856,9 +896,12 @@ message UpdateOptions {
 // +protobuf.nullable=true
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message Verbs {
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
+
   // items, if empty, will result in an empty slice
 
-  repeated string items = 1;
+  repeated string items = 1 [(gogoproto.customname) = "Items"];
 }
 
 // Event represents a single event to a watched resource.
@@ -867,13 +910,13 @@ message Verbs {
 // +k8s:deepcopy-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 message WatchEvent {
-  optional string type = 1;
+  optional string type = 1 [(gogoproto.customname) = "Type", (gogoproto.nullable) = false];
 
   // Object is:
   //  * If Type is Added or Modified: the new state of the object.
   //  * If Type is Deleted: the state of the object immediately before deletion.
   //  * If Type is Error: *Status is recommended; other types may make sense
   //    depending on context.
-  optional k8s.io.apimachinery.pkg.runtime.RawExtension object = 2;
+  optional k8s.io.apimachinery.pkg.runtime.RawExtension object = 2 [(gogoproto.customname) = "Object", (gogoproto.nullable) = false];
 }
 

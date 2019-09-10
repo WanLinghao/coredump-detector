@@ -21,7 +21,18 @@ syntax = 'proto2';
 
 package k8s.io.apimachinery.pkg.util.intstr;
 
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
 // Package-wide variables from generator "generated".
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.stable_marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_getters_all) = false;
 option go_package = "intstr";
 
 // IntOrString is a type that can hold an int32 or a string.  When used in
@@ -34,10 +45,13 @@ option go_package = "intstr";
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 // +k8s:openapi-gen=true
 message IntOrString {
-  optional int64 type = 1;
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.stringer) = false;
 
-  optional int32 intVal = 2;
+  optional int64 type = 1 [(gogoproto.casttype) = "Type", (gogoproto.customname) = "Type", (gogoproto.nullable) = false];
 
-  optional string strVal = 3;
+  optional int32 intVal = 2 [(gogoproto.customname) = "IntVal", (gogoproto.nullable) = false];
+
+  optional string strVal = 3 [(gogoproto.customname) = "StrVal", (gogoproto.nullable) = false];
 }
 

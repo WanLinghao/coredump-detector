@@ -90,3 +90,11 @@ func (m *Time) MarshalTo(data []byte) (int, error) {
 	}
 	return m.ProtoTime().MarshalTo(data)
 }
+
+// MarshalToSizedBuffer implements the protobuf reverse marshaling interface.
+func (m *Time) MarshalToSizedBuffer(data []byte) (int, error) {
+	if m == nil || m.Time.IsZero() {
+		return 0, nil
+	}
+	return m.ProtoTime().MarshalToSizedBuffer(data)
+}

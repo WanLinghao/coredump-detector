@@ -21,7 +21,18 @@ syntax = 'proto2';
 
 package k8s.io.apimachinery.pkg.runtime;
 
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
 // Package-wide variables from generator "generated".
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.stable_marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_getters_all) = false;
 option go_package = "runtime";
 
 // RawExtension is used to hold extensions in external versions.
@@ -73,7 +84,7 @@ message RawExtension {
   // Raw is the underlying serialization of this object.
   //
   // TODO: Determine how to detect ContentType and ContentEncoding of 'Raw' data.
-  optional bytes raw = 1;
+  optional bytes raw = 1 [(gogoproto.customname) = "Raw"];
 }
 
 // TypeMeta is shared by all top level objects. The proper way to use it is to inline it in your type,
@@ -92,10 +103,10 @@ message RawExtension {
 // +k8s:openapi-gen=true
 message TypeMeta {
   // +optional
-  optional string apiVersion = 1;
+  optional string apiVersion = 1 [(gogoproto.customname) = "APIVersion", (gogoproto.nullable) = false];
 
   // +optional
-  optional string kind = 2;
+  optional string kind = 2 [(gogoproto.customname) = "Kind", (gogoproto.nullable) = false];
 }
 
 // Unknown allows api objects with unknown types to be passed-through. This can be used
@@ -109,19 +120,19 @@ message TypeMeta {
 // +protobuf=true
 // +k8s:openapi-gen=true
 message Unknown {
-  optional TypeMeta typeMeta = 1;
+  optional TypeMeta typeMeta = 1 [(gogoproto.customname) = "TypeMeta", (gogoproto.nullable) = false];
 
   // Raw will hold the complete serialized object which couldn't be matched
   // with a registered type. Most likely, nothing should be done with this
   // except for passing it through the system.
-  optional bytes raw = 2;
+  optional bytes raw = 2 [(gogoproto.customname) = "Raw"];
 
   // ContentEncoding is encoding used to encode 'Raw' data.
   // Unspecified means no encoding.
-  optional string contentEncoding = 3;
+  optional string contentEncoding = 3 [(gogoproto.customname) = "ContentEncoding", (gogoproto.nullable) = false];
 
   // ContentType  is serialization method used to serialize 'Raw'.
   // Unspecified means ContentTypeJSON.
-  optional string contentType = 4;
+  optional string contentType = 4 [(gogoproto.customname) = "ContentType", (gogoproto.nullable) = false];
 }
 

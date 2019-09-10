@@ -21,7 +21,18 @@ syntax = 'proto2';
 
 package k8s.io.apimachinery.pkg.api.resource;
 
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
 // Package-wide variables from generator "generated".
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.stable_marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.goproto_unrecognized_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = false;
+option (gogoproto.goproto_getters_all) = false;
 option go_package = "resource";
 
 // Quantity is a fixed-point representation of a number.
@@ -83,6 +94,12 @@ option go_package = "resource";
 // +k8s:deepcopy-gen=true
 // +k8s:openapi-gen=true
 message Quantity {
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.marshaler) = false;
+  option (gogoproto.sizer) = false;
+  option (gogoproto.stringer) = false;
+  option (gogoproto.unmarshaler) = false;
+
   optional string string = 1;
 }
 
