@@ -21,12 +21,11 @@ import (
 	_ "github.com/go-openapi/loads"
 	_ "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/cmd/server"
 	_ "k8s.io/client-go/plugin/pkg/client/auth" // Enable cloud provider auth
+	"sigs.k8s.io/apiserver-builder-alpha/pkg/cmd/server"
 
 	"github.com/WanLinghao/coredump-detector/pkg/apis"
 	backend "github.com/WanLinghao/coredump-detector/pkg/backend/options"
-	gc "github.com/WanLinghao/coredump-detector/pkg/gc/options"
 	"github.com/WanLinghao/coredump-detector/pkg/openapi"
 	"github.com/spf13/cobra"
 )
@@ -36,18 +35,19 @@ func main() {
 
 	flagFuncs := []func(*cobra.Command) error{
 		backend.BackendPathSetFunc,
-		gc.GCSetFunc,
 	}
 
-	opts := &server.StartOptions{
-		EtcdPath:    "/registry/fujitsu.com",
-		Apis:        apis.GetAllApiBuilders(),
-		Openapidefs: openapi.GetOpenAPIDefinitions,
-		Title:       "Api",
-		Version:     version,
-
+	err := server.StartApiServerWithOptions(&server.StartOptions{
+		EtcdPath:        "/registry/fujitsu.com",
+		Apis:            apis.GetAllApiBuilders(),
+		Openapidefs:     openapi.GetOpenAPIDefinitions,
+		Title:           "Api",
+		Version:         version,
 		FlagConfigFuncs: flagFuncs,
+		// TweakConfigFuncs []func(apiServer *apiserver.Config) error
+		// FlagConfigFuncs []func(*cobra.Command) error
+	})
+	if err != nil {
+		panic(err)
 	}
-	server.StartApiServerWithOptions(opts)
-	//server.StartApiServer("/registry/fujitsu.com", apis.GetAllApiBuilders(), openapi.GetOpenAPIDefinitions, "Api", version, )
 }

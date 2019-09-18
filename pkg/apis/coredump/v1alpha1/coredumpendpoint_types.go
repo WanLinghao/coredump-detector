@@ -17,8 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"log"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -32,24 +30,25 @@ import (
 // +subresource:request=CoredumpEndpointDump,path=dump,kind=CoredumpEndpointDump
 type CoredumpEndpoint struct {
 	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	Spec   CoredumpEndpointSpec   `json:"spec,omitempty"`
-	Status CoredumpEndpointStatus `json:"status,omitempty"`
+	Spec   CoredumpEndpointSpec   `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	Status CoredumpEndpointStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
 
 // CoredumpEndpointSpec defines the desired state of CoredumpEndpoint
 type CoredumpEndpointSpec struct {
-	PodUID types.UID `json:"podUID,omitempty"`
+	PodUID types.UID `json:"poduid,omitempty" protobuf:"bytes,1,opt,name=poduid"`
 }
 
 // CoredumpEndpointStatus defines the observed state of CoredumpEndpoint
 type CoredumpEndpointStatus struct {
 }
 
-// DefaultingFunction sets default CoredumpEndpoint field values
-func (CoredumpEndpointSchemeFns) DefaultingFunction(o interface{}) {
-	obj := o.(*CoredumpEndpoint)
-	// set default field values here
-	log.Printf("Defaulting fields for CoredumpEndpoint %s\n", obj.Name)
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:openapi-gen=true
+
+type CoredumpGetOptions struct {
+	metav1.TypeMeta `json:",inline"`
+	Container       string `json:"container,omitempty" protobuf:"bytes,1,opt,name=container"`
 }

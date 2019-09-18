@@ -19,10 +19,10 @@ package v1alpha1_test
 import (
 	"testing"
 
-	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/rest"
+	"sigs.k8s.io/apiserver-builder-alpha/pkg/test"
 
 	"github.com/WanLinghao/coredump-detector/pkg/apis"
 	"github.com/WanLinghao/coredump-detector/pkg/client/clientset_generated/clientset"

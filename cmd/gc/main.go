@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-//	"time"
+	//	"time"
 	"github.com/spf13/cobra"
 
 	backendopts "github.com/WanLinghao/coredump-detector/pkg/backend/options"

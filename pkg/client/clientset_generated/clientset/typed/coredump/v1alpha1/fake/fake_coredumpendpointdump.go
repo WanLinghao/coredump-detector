@@ -119,7 +119,7 @@ func (c *FakeCoredumpEndpointDumps) DeleteCollection(options *v1.DeleteOptions, 
 // Patch applies the patch and returns the patched coredumpEndpointDump.
 func (c *FakeCoredumpEndpointDumps) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.CoredumpEndpointDump, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(coredumpendpointdumpsResource, c.ns, name, data, subresources...), &v1alpha1.CoredumpEndpointDump{})
+		Invokes(testing.NewPatchSubresourceAction(coredumpendpointdumpsResource, c.ns, name, pt, data, subresources...), &v1alpha1.CoredumpEndpointDump{})
 
 	if obj == nil {
 		return nil, err

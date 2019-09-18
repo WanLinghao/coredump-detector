@@ -17,16 +17,16 @@ limitations under the License.
 package coredumpendpoint
 
 import (
-	stdlog "log"
 	"os"
 	"sync"
 	"testing"
 
 	"github.com/WanLinghao/coredump-detector/pkg/apis"
 	"github.com/onsi/gomega"
-	"github.com/yue9944882/apiserver-builder-alpha/pkg/test/suite"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	stdlog "k8s.io/klog"
+	"sigs.k8s.io/apiserver-builder-alpha/pkg/test/suite"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -50,12 +50,12 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 
-	stdlog.Print("stopping aggregated-apiserver..")
+	stdlog.Info("stopping aggregated-apiserver..")
 	if err := env.StopLocalAggregatedAPIServer(); err != nil {
 		stdlog.Fatal(err)
 		return
 	}
-	stdlog.Print("stopping kube-apiserver..")
+	stdlog.Info("stopping kube-apiserver..")
 	if err := env.StopLocalKubeAPIServer(); err != nil {
 		stdlog.Fatal(err)
 		return

@@ -82,7 +82,7 @@ func (in *CoredumpEndpointDump) DeepCopyObject() runtime.Object {
 func (in *CoredumpEndpointDumpList) DeepCopyInto(out *CoredumpEndpointDumpList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]CoredumpEndpointDump, len(*in))
@@ -115,7 +115,7 @@ func (in *CoredumpEndpointDumpList) DeepCopyObject() runtime.Object {
 func (in *CoredumpEndpointList) DeepCopyInto(out *CoredumpEndpointList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]CoredumpEndpoint, len(*in))

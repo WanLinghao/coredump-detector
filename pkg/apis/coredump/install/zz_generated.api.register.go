@@ -19,11 +19,28 @@ limitations under the License.
 package install
 
 import (
-	"github.com/WanLinghao/coredump-detector/pkg/apis"
+	"github.com/WanLinghao/coredump-detector/pkg/apis/coredump"
+	"github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"sigs.k8s.io/apiserver-builder-alpha/pkg/builders"
 )
 
+func init() {
+	Install(builders.Scheme)
+}
+
 func Install(scheme *runtime.Scheme) {
-	utilruntime.Must(apis.GetCoredumpAPIBuilder().AddToScheme(scheme))
+	utilruntime.Must(v1alpha1.AddToScheme(scheme))
+	utilruntime.Must(coredump.AddToScheme(scheme))
+	utilruntime.Must(addKnownTypes(scheme))
+}
+
+func addKnownTypes(scheme *runtime.Scheme) error {
+	scheme.AddKnownTypes(coredump.SchemeGroupVersion,
+		&coredump.CoredumpEndpoint{},
+		&coredump.CoredumpEndpointList{},
+		&coredump.CoredumpEndpointDump{},
+	)
+	return nil
 }

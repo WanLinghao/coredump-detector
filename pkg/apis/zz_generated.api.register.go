@@ -20,9 +20,10 @@ package apis
 
 import (
 	"github.com/WanLinghao/coredump-detector/pkg/apis/coredump"
+	_ "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/install"
 	coredumpv1alpha1 "github.com/WanLinghao/coredump-detector/pkg/apis/coredump/v1alpha1"
-	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/apiserver-builder-alpha/pkg/builders"
 )
 
 var (

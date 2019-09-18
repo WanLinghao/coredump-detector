@@ -21,9 +21,9 @@ limitations under the License.
 package coredump
 
 import (
-	"github.com/kubernetes-incubator/apiserver-builder-alpha/pkg/builders"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/apiserver-builder-alpha/pkg/builders"
 )
 
 func init() {
