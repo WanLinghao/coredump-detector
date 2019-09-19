@@ -44,17 +44,17 @@ openssl req -x509 -newkey rsa:2048 -keyout $dir/apiserver_ca.key  -out $dir/apis
 openssl req -out $dir/apiserver.csr -new -newkey rsa:2048 -nodes -keyout $dir/apiserver.key -subj /C=un/ST=st/L=l/O=o/OU=ou/CN=$name.$namespace.svc
 openssl x509 -req -days 365 -in $dir/apiserver.csr -CA $dir/apiserver_ca.crt -CAkey $dir/apiserver_ca.key -CAcreateserial -out $dir/apiserver.crt
 
-cp ./apiserver_template.yaml $dir/apiserver.yaml
+cp ./coredump_template.yaml $dir/coredump.yaml
 
 api_svc_pem=$(extract_pem $dir/apiserver_ca.crt)
 echo $api_svc_pem
-replace_str __APISERVICE_CA_BUNDLE__ $api_svc_pem $dir/apiserver.yaml
+replace_str __APISERVICE_CA_BUNDLE__ $api_svc_pem $dir/coredump.yaml
 
 svc_crt=$(extract_pem $dir/apiserver.crt)
-replace_str __SERVICE_TLS_CRT__ $svc_crt $dir/apiserver.yaml
+replace_str __SERVICE_TLS_CRT__ $svc_crt $dir/coredump.yaml
 
 svc_key=$(extract_pem $dir/apiserver.key)
-replace_str __SERVICE_TLS_KEY__ $svc_key $dir/apiserver.yaml
+replace_str __SERVICE_TLS_KEY__ $svc_key $dir/coredump.yaml
 
-replace_str __NAMESPACE__ $namespace $dir/apiserver.yaml
-replace_str __SERVICE_NAME__ $name $dir/apiserver.yaml
+replace_str __NAMESPACE__ $namespace $dir/coredump.yaml
+replace_str __SERVICE_NAME__ $name $dir/coredump.yaml

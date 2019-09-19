@@ -6,7 +6,13 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: coredump-apiserver
+  name: coredump-api
+  namespace: __NAMESPACE__
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: coredump-gc
   namespace: __NAMESPACE__
 ---
 apiVersion: apiregistration.k8s.io/v1
@@ -32,7 +38,7 @@ metadata:
   name: __SERVICE_NAME__
   namespace: __NAMESPACE__
   labels:
-    api: coredump
+    api: coredump-api
     apiserver: "true"
 spec:
   ports:
@@ -40,50 +46,32 @@ spec:
     protocol: TCP
     targetPort: 443
   selector:
-    api: coredump
+    api: coredump-api
     apiserver: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: coredump
+  name: coredump-api
   namespace: __NAMESPACE__
   labels:
-    api: coredump
+    api: coredump-api
     apiserver: "true"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      api: coredump 
+      api: coredump-api
   template:
     metadata:
       labels:
-        api: coredump
+        api: coredump-api
         apiserver: "true"
     spec:
-      serviceAccountName: coredump-apiserver
+      serviceAccountName: coredump-api
       containers:
-      - name: gc
-        image: wlhtorresowen/fujitsu-coredump-gc:v0.2
-        volumeMounts:
-        - name: coredump-backend
-          mountPath: /coredump-backend
-          readOnly: false
-        command:
-        - "./gc"
-        args:
-        - "--backend-kind=local"
-        - "--local-path=/coredump-backend"
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits:
-            cpu: 100m
-            memory: 300Mi
       - name: apiserver
-        image: wlhtorresowen/:v0.3
+        image: wlhtorresowen/fujitsu-coredump:v1.0-alpha
         volumeMounts:
         - name: apiserver-certs
           mountPath: /apiserver.local.config/certificates
@@ -113,6 +101,51 @@ spec:
       - name: apiserver-certs
         secret:
           secretName: servercrt
+      - name: coredump-backend
+        hostPath:
+          path: /tmp/coredump-backend-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredump-gc
+  namespace: __NAMESPACE__
+  labels:
+    api: coredump-gc
+    apiserver: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      api: coredump-gc
+  template:
+    metadata:
+      labels:
+        api: coredump-gc
+        apiserver: "true"
+    spec:
+      serviceAccountName: coredump-gc
+      containers:
+      - name: gc
+        image: wlhtorresowen/fujitsu-coredump-gc:v1.0-alpha
+        volumeMounts:
+        - name: coredump-backend
+          mountPath: /coredump-backend
+          readOnly: false
+        command:
+        - "./gc"
+        args:
+        - "--backend-kind=local"
+        - "--local-path=/coredump-backend"
+        - "--gc-threshold=30m"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 100m
+            memory: 300Mi
+      volumes:
       - name: coredump-backend
         hostPath:
           path: /tmp/coredump-backend-storage
@@ -211,25 +244,80 @@ data:
   tls.key: __SERVICE_TLS_KEY__
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: coredump-api-role
+  namespace: kube-system
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["configmaps"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: coredump-api-rolebinding
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: coredump-api-role
+subjects:
+- kind: ServiceAccount
+  name: coredump-api
+  namespace: __NAMESPACE__
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: default-for-aggr
+  name: coredump-api-clusterrole
 rules:
-- apiGroups: ["authorization.k8s.io", "apps", "coredump.fujitsu.com", ""] # "" indicates the core API group
-  resources: ["subjectaccessreviews", "deployments", "mycontrollers","coredumpendpoints", "configmaps", "pods", "namespaces"]
-  verbs: ["get", "watch", "create", "list"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["namespaces", "pods"]
+  verbs: ["get"]
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
+  verbs: ["list", "watch"]
+- apiGroups: ["authorization.k8s.io"]
+  resources: ["subjectaccessreviews"]
+  verbs: ["create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: default-for-aggr-binding
+  name: coredump-api-clusterrolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: default-for-aggr
+  name: coredump-api-clusterrole
 subjects:
 - kind: ServiceAccount
-  name: coredump-apiserver
+  name: coredump-api
+  namespace: __NAMESPACE__
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: coredump-gc-clusterrole
+rules:
+- apiGroups: ["coredump.fujitsu.com"]
+  resources: ["coredumpendpoints"]
+  verbs: ["get", "delete"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["namespaces", "pods"]
+  verbs: ["list", "watch", "get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: coredump-gc-clusterrolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: coredump-gc-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: coredump-gc
   namespace: __NAMESPACE__
 ---
 apiVersion: apps/v1
