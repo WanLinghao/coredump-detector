@@ -27,7 +27,6 @@ import (
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	kubeinformers "k8s.io/client-go/informers"
@@ -189,38 +188,35 @@ func (ig *InformerGC) syncCoredumpEndpoint(key string) error {
 	if err != nil {
 		return err
 	}
-	if ns == "" {
-		return fmt.Errorf("unexpected empty namespace")
+
+	if ns == "" || cdeName == "" || podUID == "" {
+		return fmt.Errorf("unexpected key in syncCoredumpEndpoint: %s", key)
 	}
 
-	allErrors := []error{}
-	if cdeName != "" {
-		// Clean one coredumpendpoint
-		currentCde, err := ig.coredumpEndpointClient.CoredumpV1alpha1().CoredumpEndpoints(ns).Get(cdeName, metav1.GetOptions{})
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				allErrors = append(allErrors, err)
-			}
+	// Clean coredumpendpoint
+	currentCde, err := ig.coredumpEndpointClient.CoredumpV1alpha1().CoredumpEndpoints(ns).Get(cdeName, metav1.GetOptions{})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// The coredumpendpoint has been deleted, so we do nothing here.
+			return nil
+		} else {
+			return fmt.Errorf("failed to check if coredumpendpoint still exist before deletion: %v", err)
 		}
+	}
 
-		if string(currentCde.Spec.PodUID) == podUID {
-			// check the coredumpendpoint we are handling refers the same pod to the exist one in cluster
-			klog.Infof("Clean coredumpendpoint object %s/%s refering pod uid %s", ns, cdeName, podUID)
-			err = ig.coredumpEndpointClient.CoredumpV1alpha1().CoredumpEndpoints(ns).Delete(cdeName, &metav1.DeleteOptions{})
-			if err != nil {
-				allErrors = append(allErrors, err)
-			}
+	if string(currentCde.Spec.PodUID) == podUID {
+		// check the coredumpendpoint we are handling refers the same pod to the exist one in cluster
+		klog.Infof("Clean coredumpendpoint object %s/%s refering pod uid %s", ns, cdeName, podUID)
+		err = ig.coredumpEndpointClient.CoredumpV1alpha1().CoredumpEndpoints(ns).Delete(cdeName, &metav1.DeleteOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to delete coredumpendpoint %s with pod uid %s in namespace %s: %v", cdeName, podUID, ns, err)
 		}
 	} else {
-		// Clean whole namespace
-		// TODO: this should be done automatically by apiserver
-		klog.Infof("Clean all coredumpendpoint objects in namespace %s", ns)
-		err = ig.coredumpEndpointClient.CoredumpV1alpha1().CoredumpEndpoints(ns).DeleteCollection(nil, metav1.ListOptions{})
-		if err != nil {
-			allErrors = append(allErrors, err)
-		}
+		klog.Infof("Give up cleaning coredumpendpint %s in namespace %s since the bound pod uid has changed from %s to %s",
+			cdeName, ns, podUID, currentCde.Spec.PodUID)
 	}
-	return utilerrors.NewAggregate(allErrors)
+
+	return nil
 }
 
 func (ig *InformerGC) namespaceDeleted(obj interface{}) {
@@ -229,8 +225,8 @@ func (ig *InformerGC) namespaceDeleted(obj interface{}) {
 		// double check
 		return
 	}
+
 	ig.backendCleanQueue.Add(ig.generateKey(ns.Name, "", ""))
-	ig.coredumpEndpointCleanQueue.Add(ig.generateKey(ns.Name, "", ""))
 }
 
 func (ig *InformerGC) podDeleted(obj interface{}) {
@@ -247,7 +243,7 @@ func (ig *InformerGC) podDeleted(obj interface{}) {
 }
 
 func (ig *InformerGC) generateKey(ns, name, podUID string) string {
-	return ns + "/" + podUID
+	return ns + "/" + name + "/" + podUID
 }
 
 func (ig *InformerGC) splitKey(key string) (ns, name, podUID string, err error) {
@@ -255,7 +251,7 @@ func (ig *InformerGC) splitKey(key string) (ns, name, podUID string, err error) 
 	if len(fileds) != 3 {
 		return "", "", "", fmt.Errorf("unexpected key:%s", fileds)
 	}
-	return fileds[0], fileds[1], fileds[1], nil
+	return fileds[0], fileds[1], fileds[2], nil
 }
 
 // This function was copied from package k8s.io/kubernetes/pkg/controller
