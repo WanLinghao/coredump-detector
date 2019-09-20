@@ -323,20 +323,20 @@ subjects:
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: kcdt-ds
+  name: kcdt
   namespace: __NAMESPACE__
 spec:
   selector:
     matchLabels:
-      name: kcdt-ds
+      name: kcdt
   template:
     metadata:
       labels:
-        name: kcdt-ds
+        name: kcdt
     spec:
       containers:
       - name: kcdt-container
-        image: fenggw/kcdt
+        image: fenggw/kcdt:v1.0
         securityContext:
           privileged: true
         volumeMounts:
