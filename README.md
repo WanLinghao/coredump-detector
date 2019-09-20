@@ -87,11 +87,7 @@ The k8s cluster must boot with `allow-privileged` option enabled.
 
 ### From script
 
-We have a [auto deploy script](deploy/deploy.sh) which could generate a yaml file. Then run `kubectl create -f [yaml file]` deploy it in your cluster.
-This script uses local '/tmp' directory as backend storage to store core files and etcd data.
-It also generates certificates automatically to let [aggregation api](https://kubernetes.io/docs/tasks/access-kubernetes-api/setup-extension-api-server/) use.
-You could replace either backend storage or certificates with your own one.
-For more information about this script, please see [structure.md](deploy/structure.md)
+Please See [deploy.md](deploy/deploy.md)
 
 ### From source code
 
