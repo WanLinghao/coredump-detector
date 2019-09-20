@@ -63,6 +63,10 @@ func (a *awsStorage) CleanCoreFiles(ns, podUID, container string) error {
 	return nil
 }
 
+func (a *awsStorage) CoreFilesExist(ns, podUID, container string) (bool, error) {
+	return false, nil
+}
+
 // ----------------------------------------------------------
 // implements github.com/aws/aws-sdk-go/aws/credentials.Provider interface
 func (a *awsStorage) Retrieve() (credentials.Value, error) {

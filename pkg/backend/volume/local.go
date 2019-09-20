@@ -87,6 +87,21 @@ func (l *localStorage) CleanCoreFiles(namespace string, podUID string, container
 	return nil
 }
 
+func (l *localStorage) CoreFilesExist(ns, podUID, container string) (bool, error) {
+	_, err := l.getPath(ns, podUID, container)
+
+	if err != nil {
+		if os.IsNotExist(err) {
+			// Indicates no core files generated in that namespace
+			return false, nil
+		} else {
+			return false, err
+		}
+	}
+
+	return true, nil
+}
+
 // getPath returns a absolute path, if the path is not exist, it returns ""
 func (l *localStorage) getPath(ns, podUID, container string) (string, error) {
 	ret := l.rootPath + "/" + ns + "/" + podUID + "/" + container

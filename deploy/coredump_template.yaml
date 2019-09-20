@@ -274,7 +274,7 @@ metadata:
 rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["namespaces", "pods"]
-  verbs: ["get"]
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["admissionregistration.k8s.io"]
   resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
   verbs: ["list", "watch"]
@@ -336,7 +336,7 @@ spec:
     spec:
       containers:
       - name: kcdt-container
-        image: fenggw/kcdt:v1.0
+        image: fenggw/kcdt
         securityContext:
           privileged: true
         volumeMounts:

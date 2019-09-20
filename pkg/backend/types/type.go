@@ -37,6 +37,7 @@ type BackendOptions struct {
 type Storage interface {
 	GetCoreFiles(namespace string, pod string, container string) (string, error)
 	CleanCoreFiles(namespace string, pod string, container string) error
+	CoreFilesExist(namespace string, pod string, container string) (bool, error)
 }
 
 type Metadata struct {
